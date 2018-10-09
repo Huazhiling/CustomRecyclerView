@@ -5,16 +5,19 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
-public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ViewConfig> headConfig;
     private List<ViewConfig> footConfig;
     private ArrayList<ViewConfig> EMPTY_LIST = new ArrayList<>();
@@ -24,8 +27,12 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private int footcount = 0;
     private Context mContext;
     private ICustomClickListener customClickListener;
+    private ConcurrentHashMap<String, View> mCache = new ConcurrentHashMap<>();
+    private RecyclerView mRecyclerView;
+    private RecyclerView.RecycledViewPool mPool;
+    private RecyclerView.LayoutManager mLayoutManager;
 
-    public CustomAdapter(List<ViewConfig> headConfig, List<ViewConfig> footConfig, RecyclerView.Adapter mAdapter, Context mContext) {
+    public CustomAdapter(List<ViewConfig> headConfig, List<ViewConfig> footConfig, RecyclerView.Adapter mAdapter, Context mContext, RecyclerView mRecyclerView) {
         this.mAdapter = mAdapter;
         this.inflater = LayoutInflater.from(mContext);
         this.mContext = mContext;
@@ -39,6 +46,13 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             this.footConfig = footConfig;
         }
+        init(mRecyclerView);
+    }
+
+    private void init(RecyclerView mRecyclerView) {
+        this.mRecyclerView = mRecyclerView;
+        this.mPool = mRecyclerView.getRecycledViewPool();
+        this.mLayoutManager = mRecyclerView.getLayoutManager();
     }
 
     /**
@@ -56,22 +70,48 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int index) {
         if (index == ViewConfig.HEADVIEW_TYPE) {
             FrameLayout contentView = (FrameLayout) inflater.inflate(R.layout.item_head_foot_parent, viewGroup, false);
-            View cView = headConfig.get(headcount++).getContentView();
+//            if (null == contentView.getTag()) {
+            contentView.setTag(contentView.getClass() + "_head_" + headcount);
+            View cView = headConfig.get(headcount).getContentView();
+            headcount += 1;
+            if (headcount > headConfig.size() - 1) {
+                headcount = 0;
+            }
+            Log.e("CustomAdapter", "headcount:" + headcount);
             ViewGroup vg = (ViewGroup) cView.getParent();
             if (vg != null) {
                 vg.removeView(cView);
             }
             contentView.addView(cView);
-            return new CustomViewHolder(contentView);
+            mCache.put((String) contentView.getTag(), contentView);
+            CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
+//                customViewHolder.setIsRecyclable(false);
+            return customViewHolder;
+//            }else{
+//                return new CustomViewHolder(mCache.get(contentView.getTag()));
+//            }
         } else if (index == ViewConfig.FOOTVIEW_TYPE) {
             FrameLayout contentView = (FrameLayout) inflater.inflate(R.layout.item_head_foot_parent, viewGroup, false);
-            View cView = footConfig.get(footcount++).getContentView();
+//            if (null == contentView.getTag()) {
+            contentView.setTag(contentView.getClass() + "_foot_" + footcount);
+            View cView = footConfig.get(footcount).getContentView();
+            footcount += 1;
+            if (footcount > footConfig.size() - 1) {
+                footcount = 0;
+            }
+            Log.e("CustomAdapter", "footcount:" + footcount);
             ViewGroup vg = (ViewGroup) cView.getParent();
             if (vg != null) {
                 vg.removeView(cView);
             }
             contentView.addView(cView);
-            return new CustomViewHolder(contentView);
+            mCache.put((String) contentView.getTag(), contentView);
+            CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
+//            customViewHolder.setIsRecyclable(false);
+            return customViewHolder;
+//            }else{
+//                return new CustomViewHolder(mCache.get(contentView.getTag()));
+//            }
         } else {
             return mAdapter.onCreateViewHolder(viewGroup, index);
         }
@@ -82,6 +122,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         CustomViewHolder customViewHolder;
         if (viewHolder instanceof CustomViewHolder) {
             customViewHolder = (CustomViewHolder) viewHolder;
+            customViewHolder.setIsRecyclable(true);
             View mParent = customViewHolder.mParent;
             //设置view的点击事件
             if (mParent instanceof ViewGroup) {
@@ -100,6 +141,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             }
                         }
                     });
+
                 }
             }
             mParent.setOnClickListener(new View.OnClickListener() {

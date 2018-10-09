@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
@@ -18,6 +20,10 @@ public class CustomRecyclerView extends RecyclerView {
     private int footCount;  //记录foot的个数
     private Adapter mAdapter; //adapter，可能是customadapter， 可能是自定义adapter
     private Context mContext;
+    private boolean isRefresh;
+    private boolean isLoadMore;
+    private View mRefreshView;
+    private View mLoadMoreView;
 
     public CustomRecyclerView(@NonNull Context context) {
         this(context, null);
@@ -38,18 +44,41 @@ public class CustomRecyclerView extends RecyclerView {
         mContext = context;
     }
 
+
+    public void addRefreshView(View mRefreshView) {
+        if (this.mRefreshView != null) {
+            return;
+        }
+        this.mRefreshView = mRefreshView;
+        addHeadView(this.mRefreshView);
+    }
+
+    public void addLoadMoreView(View mLoadMoreView) {
+        if (this.mLoadMoreView != null) {
+            return;
+        }
+        this.mLoadMoreView = mLoadMoreView;
+        addFootView(this.mLoadMoreView);
+    }
+
     /**
      * 添加HeadView的方法
      *
      * @param view
      */
-    public void addHeadView(View view) {
-        this.addHeadView(view, 0);
-    }
 
-    public void addHeadView(View view, int index) {
+    public void addHeadView(View view) {
         headCount++;
-        setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000);
+        int index = 0; //默认添加位置为0
+        if (mHeadCouListInfo.size() != 0) {
+//            View contentView = mHeadCouListInfo.get(0).getContentView();
+            if (view.equals(this.mRefreshView)) {
+                index = 0;
+            } else {
+                index = headCount-1;
+            }
+        }
+        setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000, index);
         if (mAdapter != null) {
             if (!(mAdapter instanceof CustomAdapter)) {
                 wrapHeadAdapter();
@@ -58,12 +87,17 @@ public class CustomRecyclerView extends RecyclerView {
     }
 
     public void addFootView(View view) {
-        this.addFootView(view, 0);
-    }
-
-    public void addFootView(View view, int index) {
         footCount++;
-        setFootViewConfig(view, ViewConfig.FOOTVIEW, footCount, 100000);
+        int index = 0;
+        if (mFootCouListInfo.size() != 0) {
+            View contentView = mFootCouListInfo.get(mFootCouListInfo.size() - 1).getContentView();
+            if (contentView.equals(this.mLoadMoreView)) {
+                index = mFootCouListInfo.size() - 1;
+            } else {
+                index = mFootCouListInfo.size();
+            }
+        }
+        setFootViewConfig(view, ViewConfig.FOOTVIEW, footCount, 100000, index);
         if (mAdapter != null) {
             if (!(mAdapter instanceof CustomAdapter)) {
                 wrapHeadAdapter();
@@ -75,13 +109,13 @@ public class CustomRecyclerView extends RecyclerView {
      * 将adapter构建为customadapter用来填充头部尾部布局
      */
     private void wrapHeadAdapter() {
-        mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, mAdapter, mContext);
+        mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, mAdapter, mContext,this);
     }
 
     @Override
     public void setAdapter(@Nullable Adapter adapter) {
         if (mHeadCouListInfo.size() > 0 || mFootCouListInfo.size() > 0) {
-            mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, adapter, mContext);
+            mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, adapter, mContext,this);
         } else {
             mAdapter = adapter;
         }
@@ -95,8 +129,9 @@ public class CustomRecyclerView extends RecyclerView {
      * @param type
      * @param count
      * @param headCount
+     * @param index
      */
-    private void setHeadViewConfig(View view, String type, int count, int headCount) {
+    private void setHeadViewConfig(View view, String type, int count, int headCount, int index) {
         ViewConfig viewConfig = new ViewConfig();
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
@@ -106,7 +141,7 @@ public class CustomRecyclerView extends RecyclerView {
             mHeadParent.removeView(view);
         }
         viewConfig.setContentView(view);
-        mHeadCouListInfo.add(viewConfig);
+        mHeadCouListInfo.add(index, viewConfig);
     }
 
     /**
@@ -117,7 +152,7 @@ public class CustomRecyclerView extends RecyclerView {
      * @param count
      * @param headCount
      */
-    private void setFootViewConfig(View view, String type, int count, int headCount) {
+    private void setFootViewConfig(View view, String type, int count, int headCount, int index) {
         ViewConfig viewConfig = new ViewConfig();
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
@@ -127,7 +162,7 @@ public class CustomRecyclerView extends RecyclerView {
             mFootParent.removeView(view);
         }
         viewConfig.setContentView(view);
-        mFootCouListInfo.add(viewConfig);
+        mFootCouListInfo.add(index, viewConfig);
     }
 
     public CustomAdapter getHeadAndFootAdapter() {
@@ -136,5 +171,38 @@ public class CustomRecyclerView extends RecyclerView {
 
     public void setCustomClickListener(ICustomClickListener customClickListener) {
         getHeadAndFootAdapter().setCustomClickListener(customClickListener);
+    }
+
+    /**
+     * 设置是否允许刷新
+     *
+     * @param refresh
+     */
+    public void setRefresh(boolean refresh) {
+        this.isRefresh = refresh;
+    }
+
+    /**
+     * 设置是否允许加载
+     *
+     * @param loadMore
+     */
+    public void setLoadMore(boolean loadMore) {
+        this.isLoadMore = loadMore;
+    }
+
+    /**
+     * 同时设置
+     *
+     * @param isRefALoad
+     */
+    public void setRefreshAndLoadMore(boolean isRefALoad) {
+        this.isRefresh = isRefALoad;
+        this.isLoadMore = isRefALoad;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        return super.onTouchEvent(e);
     }
 }

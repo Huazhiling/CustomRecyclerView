@@ -4,12 +4,12 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.dasu.recyclerlibrary.CustomAdapter;
 import com.dasu.recyclerlibrary.CustomRecyclerView;
 import com.dasu.recyclerlibrary.ICustomClickListener;
 
@@ -29,17 +29,26 @@ public class MainActivity extends AppCompatActivity {
         this.mCustomRv = findViewById(R.id.m_customrv);
         mCustomRv.setLayoutManager(new LinearLayoutManager(this));
         RvAdapter rvAdapter = new RvAdapter(mData, this);
-        mCustomRv.addHeadView(getTextView("头部9527", Color.parseColor("#CA66F0")));
-        mCustomRv.addHeadView(getTextView("头部17131", Color.parseColor("#A6A5F1")));
-        mCustomRv.addFootView(getTextView("尾部9527", Color.parseColor("#05F066")));
-        mCustomRv.addFootView(getTextView("尾部17131", Color.parseColor("#90C56F")));
-        mCustomRv.addFootView(getTextView("尾部17131", Color.parseColor("#90C56F")));
-        mCustomRv.addFootView(getTextView("尾部17131", Color.parseColor("#856fc2")));
-        mCustomRv.addFootView(getTextView("尾部17131", Color.parseColor("#2cf0bc")));
+        mCustomRv.addRefreshView(getTextView("刷新1", Color.parseColor("#CCCCCC")));
+        mCustomRv.addHeadView(getTextView("头部1", Color.parseColor("#CA66F0")));
+        mCustomRv.addHeadView(getTextView("头部2", Color.parseColor("#90C56F")));
+        mCustomRv.addHeadView(getTextView("头部3", Color.parseColor("#856fc2")));
+        mCustomRv.addHeadView(getTextView("头部4", Color.parseColor("#2cf0bc")));
+        mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
+        mCustomRv.addFootView(getTextView("尾部2", Color.parseColor("#90C56F")));
+        final TextView load = getTextView("加载", Color.parseColor("#CCCCCC"));
+        mCustomRv.addLoadMoreView(load);
+        mCustomRv.addFootView(getTextView("尾部3", Color.parseColor("#856fc2")));
+        mCustomRv.addFootView(getTextView("尾部4", Color.parseColor("#2cf0bc")));
+        mCustomRv.addFootView(getTextView("尾部5", Color.parseColor("#856fc2")));
+        mCustomRv.addFootView(getTextView("尾部6", Color.parseColor("#2cf0bc")));
+        mCustomRv.addFootView(getTextView("尾部7", Color.parseColor("#856fc2")));
+        mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
         mCustomRv.setAdapter(rvAdapter);
         mCustomRv.setCustomClickListener(new ICustomClickListener() {
             @Override
             public void onClick(View view, int position, int type, Object... data) {
+                Log.e("CustomAdapter", "position:" + position);
             }
 
             @Override
@@ -50,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         /**
          * 添加数据源
          */
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 20; i++) {
             mData.add("mData --- " + i);
         }
     }
@@ -63,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         tv.setText(content);
         tv.setTextSize(15);
         tv.setLayoutParams(layoutParams);
-        tv.setPadding(0, 20, 0, 20);
+        tv.setPadding(0, 30, 0, 30);
         return tv;
     }
 }
