@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private List<ViewConfig> headConfig;
     private List<ViewConfig> footConfig;
     private ArrayList<ViewConfig> EMPTY_LIST = new ArrayList<>();

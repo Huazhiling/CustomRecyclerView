@@ -101,9 +101,9 @@ public class CustomRecyclerView extends RecyclerView {
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
         viewConfig.setView(R.layout.item_head_foot_parent);
-        ViewGroup parent = (ViewGroup) view.getParent();
-        if (parent != null) {
-            parent.removeView(view);
+        ViewGroup mHeadParent = (ViewGroup) view.getParent();
+        if (mHeadParent != null) {
+            mHeadParent.removeView(view);
         }
         viewConfig.setContentView(view);
         mHeadCouListInfo.add(viewConfig);
@@ -122,9 +122,9 @@ public class CustomRecyclerView extends RecyclerView {
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
         viewConfig.setView(R.layout.item_head_foot_parent);
-        ViewGroup parent = (ViewGroup) view.getParent();
-        if (parent != null) {
-            parent.removeView(view);
+        ViewGroup mFootParent = (ViewGroup) view.getParent();
+        if (mFootParent != null) {
+            mFootParent.removeView(view);
         }
         viewConfig.setContentView(view);
         mFootCouListInfo.add(viewConfig);

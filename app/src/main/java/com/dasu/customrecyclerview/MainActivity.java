@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.dasu.recyclerlibrary.CustomAdapter;
 import com.dasu.recyclerlibrary.CustomRecyclerView;
 import com.dasu.recyclerlibrary.ICustomClickListener;
 
