@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -19,7 +20,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private CustomRecyclerView mCustomRv;
     private List<String> mData;
-    private CustomRecyclerView mcustomrv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

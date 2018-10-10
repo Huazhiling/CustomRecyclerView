@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,6 +71,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int index) {
         if (index == ViewConfig.HEADVIEW_TYPE) {
+//            mLayoutManager.set
             FrameLayout contentView = (FrameLayout) inflater.inflate(R.layout.item_head_foot_parent, viewGroup, false);
 //            if (null == contentView.getTag()) {
             contentView.setTag(contentView.getClass() + "_head_" + headcount);
@@ -193,5 +196,43 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public int getFootSize() {
         return footConfig.size();
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager instanceof GridLayoutManager) {
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
+            final GridLayoutManager.SpanSizeLookup spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (getHeadSize() > position) {
+                        return gridLayoutManager.getSpanCount();
+                    } else if (position >= getHeadSize() + mAdapter.getItemCount()) {
+                        return gridLayoutManager.getSpanCount();
+                    }
+                    if (spanSizeLookup != null) return spanSizeLookup.getSpanSize(position);
+                    return 1;
+                }
+            });
+            gridLayoutManager.setSpanCount(gridLayoutManager.getSpanCount());
+        }
+
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        int position = holder.getLayoutPosition();
+        if (getHeadSize() > position || position >= getHeadSize() + mAdapter.getItemCount()) {
+            ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+            if (lp != null && lp instanceof StaggeredGridLayoutManager.LayoutParams) {
+                StaggeredGridLayoutManager.LayoutParams p = (StaggeredGridLayoutManager.LayoutParams) lp;
+                p.setFullSpan(true);
+            }
+        }
+
     }
 }
