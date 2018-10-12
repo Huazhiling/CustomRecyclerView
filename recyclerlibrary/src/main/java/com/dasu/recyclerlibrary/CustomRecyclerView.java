@@ -75,7 +75,7 @@ public class CustomRecyclerView extends RecyclerView {
             if (view.equals(this.mRefreshView)) {
                 index = 0;
             } else {
-                index = headCount-1;
+                index = headCount - 1;
             }
         }
         setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000, index);
@@ -109,16 +109,21 @@ public class CustomRecyclerView extends RecyclerView {
      * 将adapter构建为customadapter用来填充头部尾部布局
      */
     private void wrapHeadAdapter() {
-        mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, mAdapter, mContext,this);
+        mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, mAdapter, mContext, this);
     }
 
     @Override
     public void setAdapter(@Nullable Adapter adapter) {
         if (mHeadCouListInfo.size() > 0 || mFootCouListInfo.size() > 0) {
-            mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, adapter, mContext,this);
+            mAdapter = new CustomAdapter(mHeadCouListInfo, mFootCouListInfo, adapter, mContext, this);
         } else {
             mAdapter = adapter;
         }
+        /**
+         * 设置头尾的两个缓存为size  变相解决复用问题
+         */
+        getRecycledViewPool().setMaxRecycledViews(ViewConfig.FOOTVIEW_TYPE,mFootCouListInfo.size());
+        getRecycledViewPool().setMaxRecycledViews(ViewConfig.HEADVIEW_TYPE,mHeadCouListInfo.size());
         super.setAdapter(mAdapter);
     }
 

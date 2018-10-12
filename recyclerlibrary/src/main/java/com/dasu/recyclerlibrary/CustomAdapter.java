@@ -80,7 +80,6 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             if (headcount > headConfig.size() - 1) {
                 headcount = 0;
             }
-            Log.e("CustomAdapter", "headcount:" + headcount);
             ViewGroup vg = (ViewGroup) cView.getParent();
             if (vg != null) {
                 vg.removeView(cView);
@@ -89,6 +88,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCache.put((String) contentView.getTag(), contentView);
             CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
 //                customViewHolder.setIsRecyclable(false);
+            Log.e("CustomAdapter", "onCreateViewHolder#HEADVIEW_TYPE");
             return customViewHolder;
 //            }else{
 //                return new CustomViewHolder(mCache.get(contentView.getTag()));
@@ -102,7 +102,6 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             if (footcount > footConfig.size() - 1) {
                 footcount = 0;
             }
-            Log.e("CustomAdapter", "footcount:" + footcount);
             ViewGroup vg = (ViewGroup) cView.getParent();
             if (vg != null) {
                 vg.removeView(cView);
@@ -111,6 +110,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCache.put((String) contentView.getTag(), contentView);
             CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
 //            customViewHolder.setIsRecyclable(false);
+            Log.e("CustomAdapter", "onCreateViewHolder#FOOTVIEW_TYPE");
             return customViewHolder;
 //            }else{
 //                return new CustomViewHolder(mCache.get(contentView.getTag()));
@@ -157,6 +157,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     }
                 }
             });
+            Log.e("CustomAdapter", "onBindViewHolder" + position + "------->" + customViewHolder);
         } else {
             mAdapter.onBindViewHolder(viewHolder, position - getHeadSize());
         }
@@ -198,6 +199,11 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return footConfig.size();
     }
 
+    /**
+     * 适配GridLayoutManager
+     *
+     * @param recyclerView
+     */
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
@@ -222,6 +228,11 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     }
 
+    /**
+     * 适配StaggeredGridLayoutManager
+     *
+     * @param holder
+     */
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
@@ -233,6 +244,5 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 p.setFullSpan(true);
             }
         }
-
     }
 }
