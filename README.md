@@ -12,7 +12,7 @@ allprojects {
 在build.gradle :app添加
 ```
 dependencies {
-	implementation 'com.github.Huazhiling:CustomRecyclerView:Tag'
+	implementation 'com.github.Huazhiling:CustomRecyclerView:1.1.01'
 }
 ```
 使用方法可参考demo
