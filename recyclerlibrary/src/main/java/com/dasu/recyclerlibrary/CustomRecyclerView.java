@@ -3,6 +3,7 @@ package com.dasu.recyclerlibrary;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -173,6 +174,7 @@ public class CustomRecyclerView extends RecyclerView {
     public CustomAdapter getHeadAndFootAdapter() {
         return (CustomAdapter) mAdapter;
     }
+
 
     public void setCustomClickListener(ICustomClickListener customClickListener) {
         getHeadAndFootAdapter().setCustomClickListener(customClickListener);
