@@ -1,4 +1,4 @@
-package com.dasu.recyclerlibrary;
+package com.dasu.recyclerlibrary.module;
 
 
 import android.view.View;

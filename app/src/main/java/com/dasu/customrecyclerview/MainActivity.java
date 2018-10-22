@@ -1,9 +1,6 @@
 package com.dasu.customrecyclerview;
 
 import android.graphics.Color;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.dasu.recyclerlibrary.CustomRecyclerView;
-import com.dasu.recyclerlibrary.ICustomClickListener;
+import com.dasu.recyclerlibrary.ui.CustomRecyclerView;
+import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,17 +44,17 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addFootView(getTextView("尾部7", Color.parseColor("#856fc2")));
         mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
         mCustomRv.setAdapter(rvAdapter);
-        mCustomRv.setCustomClickListener(new ICustomClickListener() {
-            @Override
-            public void onClick(View view, int position, int type, Object... data) {
-                Log.e("CustomAdapter", "position:" + position);
-            }
-
-            @Override
-            public void onLongClick(View view, int position, int type, Object... data) {
-
-            }
-        });
+//        mCustomRv.setCustomClickListener(new ICustomClickListener() {
+//            @Override
+//            public void onClick(View view, int position, int type, Object... data) {
+//                Log.e("CustomAdapter", "position:" + position);
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position, int type, Object... data) {
+//
+//            }
+//        });
         /**
          * 添加数据源
          */

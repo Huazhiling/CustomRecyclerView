@@ -1,16 +1,19 @@
-package com.dasu.recyclerlibrary;
+package com.dasu.recyclerlibrary.ui;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
+
+import com.dasu.recyclerlibrary.adapter.CustomAdapter;
+import com.dasu.recyclerlibrary.R;
+import com.dasu.recyclerlibrary.module.ViewConfig;
+import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 
 import java.util.ArrayList;
 
@@ -25,6 +28,8 @@ public class CustomRecyclerView extends RecyclerView {
     private boolean isLoadMore;
     private View mRefreshView;
     private View mLoadMoreView;
+    private ICustomClickListener customClickListener;
+    int start_X, start_Y = 0;
 
     public CustomRecyclerView(@NonNull Context context) {
         this(context, null);
@@ -123,9 +128,24 @@ public class CustomRecyclerView extends RecyclerView {
         /**
          * 设置头尾的两个缓存为size  变相解决复用问题
          */
-        getRecycledViewPool().setMaxRecycledViews(ViewConfig.FOOTVIEW_TYPE,mFootCouListInfo.size());
-        getRecycledViewPool().setMaxRecycledViews(ViewConfig.HEADVIEW_TYPE,mHeadCouListInfo.size());
+        getRecycledViewPool().setMaxRecycledViews(ViewConfig.FOOTVIEW_TYPE, mFootCouListInfo.size());
+        getRecycledViewPool().setMaxRecycledViews(ViewConfig.HEADVIEW_TYPE, mHeadCouListInfo.size());
+        /**
+         * 计算高度
+         */
+        if (mRefreshView != null) {
+            ViewGroup.MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
+            layoutParams.topMargin = getRefreshHeight();
+            setLayoutParams(layoutParams);
+        }
         super.setAdapter(mAdapter);
+    }
+
+    private int getRefreshHeight() {
+        int width = View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        int height = View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        mRefreshView.measure(width, height);
+        return -mRefreshView.getMeasuredHeight();
     }
 
     /**
@@ -177,6 +197,7 @@ public class CustomRecyclerView extends RecyclerView {
 
 
     public void setCustomClickListener(ICustomClickListener customClickListener) {
+        this.customClickListener = customClickListener;
         getHeadAndFootAdapter().setCustomClickListener(customClickListener);
     }
 
@@ -210,6 +231,38 @@ public class CustomRecyclerView extends RecyclerView {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        setCustomClickListener(null);
+        Log.e("CustomRecyclerView", "e.getAction():" + e.getAction());
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                start_X = (int) e.getX();
+                start_Y = (int) e.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                int end_X, end_Y;
+                end_X = (int) e.getX();
+                end_Y = (int) e.getY();
+                ViewGroup.MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
+                if ((end_Y - start_Y) > 0) {
+                    int i = end_Y - start_Y;
+                    layoutParams.topMargin = layoutParams.topMargin + (i / 2);
+                    setLayoutParams(layoutParams);
+                } else {
+                    Log.e("CustomRecyclerView", "layoutParams.topMargin:" + layoutParams.topMargin);
+                    Log.e("CustomRecyclerView", "getRefreshHeight():" + getRefreshHeight());
+                    if (layoutParams.topMargin - getRefreshHeight() > 0){
+
+                    }
+                }
+                start_Y = end_Y;
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                setCustomClickListener(customClickListener);
+                break;
+            case MotionEvent.ACTION_UP:
+                setCustomClickListener(customClickListener);
+                break;
+        }
         return super.onTouchEvent(e);
     }
 }

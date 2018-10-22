@@ -1,4 +1,4 @@
-package com.dasu.recyclerlibrary;
+package com.dasu.recyclerlibrary.adapter;
 
 import android.content.Context;
 import android.os.Build;
@@ -12,8 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
+
+import com.dasu.recyclerlibrary.R;
+import com.dasu.recyclerlibrary.module.ViewConfig;
+import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +33,6 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Context mContext;
     private ICustomClickListener customClickListener;
     private ConcurrentHashMap<String, View> mCache = new ConcurrentHashMap<>();
-    private RecyclerView mRecyclerView;
-    private RecyclerView.RecycledViewPool mPool;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     public CustomAdapter(List<ViewConfig> headConfig, List<ViewConfig> footConfig, RecyclerView.Adapter mAdapter, Context mContext, RecyclerView mRecyclerView) {
         this.mAdapter = mAdapter;
@@ -48,13 +48,6 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             this.footConfig = footConfig;
         }
-        init(mRecyclerView);
-    }
-
-    private void init(RecyclerView mRecyclerView) {
-        this.mRecyclerView = mRecyclerView;
-        this.mPool = mRecyclerView.getRecycledViewPool();
-        this.mLayoutManager = mRecyclerView.getLayoutManager();
     }
 
     /**
@@ -88,7 +81,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCache.put((String) contentView.getTag(), contentView);
             CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
 //                customViewHolder.setIsRecyclable(false);
-            Log.e("CustomAdapter", "onCreateViewHolder#HEADVIEW_TYPE");
+//            Log.e("CustomAdapter", "onCreateViewHolder#HEADVIEW_TYPE");
             return customViewHolder;
 //            }else{
 //                return new CustomViewHolder(mCache.get(contentView.getTag()));
@@ -110,7 +103,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCache.put((String) contentView.getTag(), contentView);
             CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
 //            customViewHolder.setIsRecyclable(false);
-            Log.e("CustomAdapter", "onCreateViewHolder#FOOTVIEW_TYPE");
+//            Log.e("CustomAdapter", "onCreateViewHolder#FOOTVIEW_TYPE");
             return customViewHolder;
 //            }else{
 //                return new CustomViewHolder(mCache.get(contentView.getTag()));

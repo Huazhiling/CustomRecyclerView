@@ -1,4 +1,4 @@
-package com.dasu.recyclerlibrary;
+package com.dasu.recyclerlibrary.listener;
 
 import android.view.View;
 
