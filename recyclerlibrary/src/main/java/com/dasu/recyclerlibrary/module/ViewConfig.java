@@ -12,6 +12,15 @@ public class ViewConfig {
     private int view;
     private String tag;
     private View contentView;
+    private boolean isCache;    //是否需要缓存
+
+    public boolean isCache() {
+        return isCache;
+    }
+
+    public void setCache(boolean cache) {
+        isCache = cache;
+    }
 
     public View getContentView() {
         return contentView;

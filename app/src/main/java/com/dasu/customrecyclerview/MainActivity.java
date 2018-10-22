@@ -10,14 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.dasu.recyclerlibrary.ui.CustomRecyclerView;
+
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;
+import com.dasu.recyclerlibrary.ui.ScroolWrapRecycler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private CustomRecyclerView mCustomRv;
+    private ScroolWrapRecycler mCustomRv;
     private List<String> mData;
 
     @Override
@@ -29,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.setLayoutManager(new LinearLayoutManager(this));
         RvAdapter rvAdapter = new RvAdapter(mData, this);
         mCustomRv.addRefreshView(getTextView("刷新1", Color.parseColor("#CCCCCC")));
+        mCustomRv.addRefreshView(getTextView("刷新2", Color.parseColor("#CCCCCC")));
+        mCustomRv.addRefreshView(getTextView("刷新3", Color.parseColor("#CCCCCC")));
         mCustomRv.addHeadView(getTextView("头部1", Color.parseColor("#CA66F0")));
         mCustomRv.addHeadView(getTextView("头部2", Color.parseColor("#90C56F")));
         mCustomRv.addHeadView(getTextView("头部3", Color.parseColor("#856fc2")));
@@ -44,17 +47,17 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addFootView(getTextView("尾部7", Color.parseColor("#856fc2")));
         mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
         mCustomRv.setAdapter(rvAdapter);
-//        mCustomRv.setCustomClickListener(new ICustomClickListener() {
-//            @Override
-//            public void onClick(View view, int position, int type, Object... data) {
-//                Log.e("CustomAdapter", "position:" + position);
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position, int type, Object... data) {
-//
-//            }
-//        });
+        mCustomRv.setCustomClickListener(new ICustomClickListener() {
+            @Override
+            public void onClick(View view, int position, int type, Object... data) {
+                Log.e("CustomAdapter", "position:" + position);
+            }
+
+            @Override
+            public void onLongClick(View view, int position, int type, Object... data) {
+
+            }
+        });
         /**
          * 添加数据源
          */

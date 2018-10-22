@@ -5,19 +5,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dasu.recyclerlibrary.adapter.CustomAdapter;
+import com.dasu.recyclerlibrary.CustomAdapter;
 import com.dasu.recyclerlibrary.R;
 import com.dasu.recyclerlibrary.module.ViewConfig;
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 
 import java.util.ArrayList;
 
-public class CustomRecyclerView extends RecyclerView {
+class CustomRecyclerView extends RecyclerView {
     private ArrayList<ViewConfig> mHeadCouListInfo; //保存头部的view
     private ArrayList<ViewConfig> mFootCouListInfo; //保存尾部的view
     private int headCount;  //记录head的个数
@@ -50,6 +48,13 @@ public class CustomRecyclerView extends RecyclerView {
         mContext = context;
     }
 
+    public ArrayList<ViewConfig> getmHeadCouListInfo() {
+        return mHeadCouListInfo;
+    }
+
+    public ArrayList<ViewConfig> getmFootCouListInfo() {
+        return mFootCouListInfo;
+    }
 
     public void addRefreshView(View mRefreshView) {
         if (this.mRefreshView != null) {
@@ -74,6 +79,10 @@ public class CustomRecyclerView extends RecyclerView {
      */
 
     public void addHeadView(View view) {
+        addHeadView(view, false);
+    }
+
+    public void addHeadView(View view, boolean isCache) {
         headCount++;
         int index = 0; //默认添加位置为0
         if (mHeadCouListInfo.size() != 0) {
@@ -84,7 +93,7 @@ public class CustomRecyclerView extends RecyclerView {
                 index = headCount - 1;
             }
         }
-        setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000, index);
+        setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000, index, isCache);
         if (mAdapter != null) {
             if (!(mAdapter instanceof CustomAdapter)) {
                 wrapHeadAdapter();
@@ -156,12 +165,14 @@ public class CustomRecyclerView extends RecyclerView {
      * @param count
      * @param headCount
      * @param index
+     * @param isCache
      */
-    private void setHeadViewConfig(View view, String type, int count, int headCount, int index) {
+    private void setHeadViewConfig(View view, String type, int count, int headCount, int index, boolean isCache) {
         ViewConfig viewConfig = new ViewConfig();
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
         viewConfig.setView(R.layout.item_head_foot_parent);
+        viewConfig.setCache(isCache);
         ViewGroup mHeadParent = (ViewGroup) view.getParent();
         if (mHeadParent != null) {
             mHeadParent.removeView(view);
@@ -229,40 +240,16 @@ public class CustomRecyclerView extends RecyclerView {
         this.isLoadMore = isRefALoad;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        setCustomClickListener(null);
-        Log.e("CustomRecyclerView", "e.getAction():" + e.getAction());
-        switch (e.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                start_X = (int) e.getX();
-                start_Y = (int) e.getY();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                int end_X, end_Y;
-                end_X = (int) e.getX();
-                end_Y = (int) e.getY();
-                ViewGroup.MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
-                if ((end_Y - start_Y) > 0) {
-                    int i = end_Y - start_Y;
-                    layoutParams.topMargin = layoutParams.topMargin + (i / 2);
-                    setLayoutParams(layoutParams);
-                } else {
-                    Log.e("CustomRecyclerView", "layoutParams.topMargin:" + layoutParams.topMargin);
-                    Log.e("CustomRecyclerView", "getRefreshHeight():" + getRefreshHeight());
-                    if (layoutParams.topMargin - getRefreshHeight() > 0){
+    /**
+     * 移除最后一个View， 就是加载更多的哪一个
+     */
+    public void removeLastFootView(int foorIndex) {
+        this.mFootCouListInfo.remove(foorIndex);
+        footCount--;
+    }
 
-                    }
-                }
-                start_Y = end_Y;
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                setCustomClickListener(customClickListener);
-                break;
-            case MotionEvent.ACTION_UP:
-                setCustomClickListener(customClickListener);
-                break;
-        }
-        return super.onTouchEvent(e);
+    public void removeFirstHeadView() {
+        this.mHeadCouListInfo.remove(0);
+        headCount--;
     }
 }

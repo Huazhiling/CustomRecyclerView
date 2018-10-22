@@ -1,4 +1,4 @@
-package com.dasu.recyclerlibrary.adapter;
+package com.dasu.recyclerlibrary;
 
 import android.content.Context;
 import android.os.Build;
@@ -12,11 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 
-import com.dasu.recyclerlibrary.R;
-import com.dasu.recyclerlibrary.module.ViewConfig;
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;
+import com.dasu.recyclerlibrary.module.ViewConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +33,9 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Context mContext;
     private ICustomClickListener customClickListener;
     private ConcurrentHashMap<String, View> mCache = new ConcurrentHashMap<>();
+    private RecyclerView mRecyclerView;
+    private RecyclerView.RecycledViewPool mPool;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     public CustomAdapter(List<ViewConfig> headConfig, List<ViewConfig> footConfig, RecyclerView.Adapter mAdapter, Context mContext, RecyclerView mRecyclerView) {
         this.mAdapter = mAdapter;
@@ -48,6 +51,13 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             this.footConfig = footConfig;
         }
+        init(mRecyclerView);
+    }
+
+    private void init(RecyclerView mRecyclerView) {
+        this.mRecyclerView = mRecyclerView;
+        this.mPool = mRecyclerView.getRecycledViewPool();
+        this.mLayoutManager = mRecyclerView.getLayoutManager();
     }
 
     /**
@@ -91,10 +101,6 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 //            if (null == contentView.getTag()) {
             contentView.setTag(contentView.getClass() + "_foot_" + footcount);
             View cView = footConfig.get(footcount).getContentView();
-            footcount += 1;
-            if (footcount > footConfig.size() - 1) {
-                footcount = 0;
-            }
             ViewGroup vg = (ViewGroup) cView.getParent();
             if (vg != null) {
                 vg.removeView(cView);
@@ -102,8 +108,11 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             contentView.addView(cView);
             mCache.put((String) contentView.getTag(), contentView);
             CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
-//            customViewHolder.setIsRecyclable(false);
-//            Log.e("CustomAdapter", "onCreateViewHolder#FOOTVIEW_TYPE");
+            customViewHolder.setIsRecyclable(footConfig.get(footcount).isCache());
+            footcount += 1;
+            if (footcount > footConfig.size() - 1) {
+                footcount = 0;
+            }
             return customViewHolder;
 //            }else{
 //                return new CustomViewHolder(mCache.get(contentView.getTag()));
@@ -150,7 +159,7 @@ public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     }
                 }
             });
-            Log.e("CustomAdapter", "onBindViewHolder" + position + "------->" + customViewHolder);
+//            Log.e("CustomAdapter", "onBindViewHolder" + position + "------->" + customViewHolder);
         } else {
             mAdapter.onBindViewHolder(viewHolder, position - getHeadSize());
         }
