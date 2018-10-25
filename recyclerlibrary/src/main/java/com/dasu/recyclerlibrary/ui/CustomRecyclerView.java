@@ -57,17 +57,17 @@ class CustomRecyclerView extends RecyclerView {
     }
 
     public void addRefreshView(View mRefreshView) {
-        if (this.mRefreshView != null) {
-            return;
-        }
+//        if (this.mRefreshView != null) {
+//            return;
+//        }
         this.mRefreshView = mRefreshView;
         addHeadView(this.mRefreshView);
     }
 
     public void addLoadMoreView(View mLoadMoreView) {
-        if (this.mLoadMoreView != null) {
-            return;
-        }
+//        if (this.mLoadMoreView != null) {
+//            return;
+//        }
         this.mLoadMoreView = mLoadMoreView;
         addFootView(this.mLoadMoreView);
     }
@@ -139,14 +139,15 @@ class CustomRecyclerView extends RecyclerView {
          */
         getRecycledViewPool().setMaxRecycledViews(ViewConfig.FOOTVIEW_TYPE, mFootCouListInfo.size());
         getRecycledViewPool().setMaxRecycledViews(ViewConfig.HEADVIEW_TYPE, mHeadCouListInfo.size());
-        /**
-         * 计算高度
-         */
-        if (mRefreshView != null) {
-            ViewGroup.MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
-            layoutParams.topMargin = getRefreshHeight();
-            setLayoutParams(layoutParams);
-        }
+        //现在交给scroolwrap处理
+//        /**
+//         * 计算高度
+//         */
+//        if (mRefreshView != null) {
+//            ViewGroup.MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
+//            layoutParams.topMargin = getRefreshHeight();
+//            setLayoutParams(layoutParams);
+//        }
         super.setAdapter(mAdapter);
     }
 
