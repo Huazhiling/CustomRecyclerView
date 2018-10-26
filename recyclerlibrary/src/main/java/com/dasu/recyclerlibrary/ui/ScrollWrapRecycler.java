@@ -361,4 +361,44 @@ public class ScrollWrapRecycler extends LinearLayout {
         animator.start();
     }
 
+    /**
+     * ====================================================================================
+     * 以下提供的方法均调用的是CustomAdapter的方法
+     * ====================================================================================
+     */
+    public void notifyDataSetChanged() {
+        this.getAdapter().notifyDataSetChanged();
+    }
+
+    public void notifyItemChanged(int position) {
+        this.getAdapter().notifyItemChanged(position);
+    }
+
+    public void notifyItemChanged(int position, Object payload) {
+        this.getAdapter().notifyItemChanged(position, payload);
+    }
+
+    public void notifyItemInserted(int position) {
+        this.getAdapter().notifyItemInserted(position);
+    }
+
+    public void notifyItemMoved(int fromPosition, int toPosition) {
+        this.getAdapter().notifyItemMoved(fromPosition, toPosition);
+    }
+
+    public void notifyItemRangeChanged(int positionStart, int itemCount) {
+        this.getAdapter().notifyItemRangeChanged(positionStart, itemCount);
+    }
+
+    public void notifyItemRangeChanged(int positionStart, int itemCount, Object payload) {
+        this.getAdapter().notifyItemRangeChanged(positionStart, itemCount, payload);
+    }
+
+    public void notifyItemRangeInserted(int positionStart, int itemCount) {
+        this.getAdapter().notifyItemRangeInserted(positionStart, itemCount);
+    }
+
+    public void notifyItemRemoved(int positionStart) {
+        this.getAdapter().notifyItemRemoved(positionStart);
+    }
 }
