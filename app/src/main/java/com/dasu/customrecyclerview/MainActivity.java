@@ -1,7 +1,6 @@
 package com.dasu.customrecyclerview;
 
 import android.graphics.Color;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,13 +13,13 @@ import android.widget.TextView;
 
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 import com.dasu.recyclerlibrary.listener.IScrollListener;
-import com.dasu.recyclerlibrary.ui.ScroolWrapRecycler;
+import com.dasu.recyclerlibrary.ui.ScrollWrapRecycler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private ScroolWrapRecycler mCustomRv;
+    private ScrollWrapRecycler mCustomRv;
     private List<String> mData;
 
     @Override
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mCustomRv.setRefreshStatus(ScroolWrapRecycler.SCROLL_REFRESH_SUCCESS);
+                        mCustomRv.setRefreshStatus(ScrollWrapRecycler.SCROLL_REFRESH_SUCCESS);
                     }
                 }, 2000);
             }

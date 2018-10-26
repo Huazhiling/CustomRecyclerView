@@ -22,7 +22,7 @@ import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 import com.dasu.recyclerlibrary.listener.ICustomScrollListener;
 import com.dasu.recyclerlibrary.listener.IScrollListener;
 
-public class ScroolWrapRecycler extends LinearLayout {
+public class ScrollWrapRecycler extends LinearLayout {
     public static final int SCROLL_NOTSLIPPING = 0;
     public static final int SCROLL_NOTMET = 1;
     public static final int SCROLL_RELEASH = 2;
@@ -44,17 +44,17 @@ public class ScroolWrapRecycler extends LinearLayout {
     private TextView mRefreshHint;
     private ValueAnimator animator;
 
-    public ScroolWrapRecycler(Context context) {
+    public ScrollWrapRecycler(Context context) {
         this(context, null);
     }
 
     private Context mContext;
 
-    public ScroolWrapRecycler(Context context, @Nullable AttributeSet attrs) {
+    public ScrollWrapRecycler(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ScroolWrapRecycler(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ScrollWrapRecycler(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

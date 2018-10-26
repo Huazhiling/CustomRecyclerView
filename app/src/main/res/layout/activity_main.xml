@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.dasu.recyclerlibrary.ui.ScroolWrapRecycler
+    <com.dasu.recyclerlibrary.ui.ScrollWrapRecycler
         android:id="@+id/m_customrv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
