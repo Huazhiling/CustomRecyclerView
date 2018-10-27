@@ -1,4 +1,4 @@
-package com.dasu.recyclerlibrary;
+package com.dasu.recyclerlibrary.ui;
 
 import android.content.Context;
 import android.os.Build;
@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 
+import com.dasu.recyclerlibrary.R;
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 import com.dasu.recyclerlibrary.module.ViewConfig;
 
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ViewConfig> headConfig;
     private List<ViewConfig> footConfig;
     private ArrayList<ViewConfig> EMPTY_LIST = new ArrayList<>();

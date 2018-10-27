@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void refresh() {
+                //模拟刷新成功
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
                     public void run() {

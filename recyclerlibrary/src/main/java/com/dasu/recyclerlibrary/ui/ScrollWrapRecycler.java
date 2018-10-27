@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
-import com.dasu.recyclerlibrary.CustomAdapter;
 import com.dasu.recyclerlibrary.R;
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 import com.dasu.recyclerlibrary.listener.ICustomScrollListener;
@@ -43,6 +42,8 @@ public class ScrollWrapRecycler extends LinearLayout {
     private IScrollListener mIScrollListener;
     private TextView mRefreshHint;
     private ValueAnimator animator;
+    private boolean isRefreshing = false;
+
 
     public ScrollWrapRecycler(Context context) {
         this(context, null);
@@ -231,53 +232,58 @@ public class ScrollWrapRecycler extends LinearLayout {
             @Override
             public void run() {
                 setScrollAnimation();
+                isRefreshing = false;
             }
         }, 1500);
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                start_X = (int) ev.getX();
-                start_Y = (int) ev.getY();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                float move_X = ev.getX();
-                float move_Y = ev.getY();
-                LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                if (mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y > 0) {
-                    return super.dispatchTouchEvent(ev);
-                    //下拉刷新的判断
-                } else if (mRefreshView != null && getMarginParams().topMargin >= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() == 0 && move_Y - start_Y > 0) {
-                    float phaseDiff = move_Y - start_Y;
-                    updateHead((float) (phaseDiff / 1.5));
-                    start_Y = move_Y;
-                    return true;
-                    //如果getMarginParams().topMargin > -refresh的高度  证明下拉了 需要先还原  还原下拉刷新的margin
-                } else if (mRefreshView != null && getMarginParams().topMargin > -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() < 1 && move_Y - start_Y < 0) {
-                    float phaseDiff = move_Y - start_Y;
-                    updateHead((float) (phaseDiff * 1.5));
-                    start_Y = move_Y;
-                    return true;
-                } else if (mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y < 0) {
-                    getMarginParams().topMargin = -mRefreshView.getMeasuredHeight();
-                    return super.dispatchTouchEvent(ev);
-                } else {
-                    return super.dispatchTouchEvent(ev);
-                }
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
-                if (mRefreshView != null) {
-                    if (scrollStatus == SCROLL_RELEASH) {
-                        refresh();
-                        scrollState(SCROLL_LOADING);
+        if (!isRefreshing) {
+            switch (ev.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    start_X = (int) ev.getX();
+                    start_Y = (int) ev.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float move_X = ev.getX();
+                    float move_Y = ev.getY();
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+                    if (mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y > 0) {
+                        return super.dispatchTouchEvent(ev);
+                        //下拉刷新的判断
+                    } else if (mRefreshView != null && getMarginParams().topMargin >= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() == 0 && move_Y - start_Y > 0) {
+                        float phaseDiff = move_Y - start_Y;
+                        updateHead((float) (phaseDiff / 1.5));
+                        start_Y = move_Y;
+                        return true;
+                        //如果getMarginParams().topMargin > -refresh的高度  证明下拉了 需要先还原  还原下拉刷新的margin
+                    } else if (mRefreshView != null && getMarginParams().topMargin > -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() < 1 && move_Y - start_Y < 0) {
+                        float phaseDiff = move_Y - start_Y;
+                        updateHead((float) (phaseDiff * 1.5));
+                        start_Y = move_Y;
+                        return true;
+                    } else if (mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y < 0) {
+                        getMarginParams().topMargin = -mRefreshView.getMeasuredHeight();
+                        return super.dispatchTouchEvent(ev);
                     } else {
-                        setScrollAnimation();
+                        return super.dispatchTouchEvent(ev);
                     }
-                }
-
-                break;
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    if (mRefreshView != null) {
+                        if (scrollStatus == SCROLL_RELEASH) {
+                            isRefreshing = true;
+                            refresh();
+                            scrollState(SCROLL_LOADING);
+                        } else {
+                            setScrollAnimation();
+                        }
+                    }
+                    break;
+            }
+        } else {
+            return true;
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -305,9 +311,9 @@ public class ScrollWrapRecycler extends LinearLayout {
         setRLayoutPramas(marginParams);
         if (isUseSelfRefresh) {
             if (mCustomScrollListener != null) {
-                if (scrollMax < mRefreshView.getMeasuredHeight() * 1.5) {
+                if (scrollMax < mRefreshView.getMeasuredHeight() * 1.2) {
                     mCustomScrollListener.scrollState(SCROLL_NOTMET);
-                } else if (scrollMax > mRefreshView.getMeasuredHeight() * 1.5) {
+                } else if (scrollMax > mRefreshView.getMeasuredHeight() * 1.2) {
                     mCustomScrollListener.scrollState(SCROLL_RELEASH);
                 }
 //                mCustomScrollListener.scrollState(scrollMax > mRefreshView.getMeasuredHeight());
