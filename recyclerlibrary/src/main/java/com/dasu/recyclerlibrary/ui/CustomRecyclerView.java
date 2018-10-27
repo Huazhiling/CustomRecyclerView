@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dasu.recyclerlibrary.CustomAdapter;
 import com.dasu.recyclerlibrary.R;
 import com.dasu.recyclerlibrary.module.ViewConfig;
 import com.dasu.recyclerlibrary.listener.ICustomClickListener;

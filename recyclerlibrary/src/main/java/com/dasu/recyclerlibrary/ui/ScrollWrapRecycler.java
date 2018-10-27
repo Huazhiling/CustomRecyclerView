@@ -22,12 +22,33 @@ import com.dasu.recyclerlibrary.listener.ICustomScrollListener;
 import com.dasu.recyclerlibrary.listener.IScrollListener;
 
 public class ScrollWrapRecycler extends LinearLayout {
+    /**
+     * 没有滑动
+     */
     public static final int SCROLL_NOTSLIPPING = 0;
+    /**
+     * 正在滑动 但是还没有到可以刷新的指定距离
+     */
     public static final int SCROLL_NOTMET = 1;
+    /**
+     * 松开后刷新
+     */
     public static final int SCROLL_RELEASH = 2;
+    /**
+     * 正在刷新
+     */
     public static final int SCROLL_LOADING = 3;
+    /**
+     * 刷新成功
+     */
     public static final int SCROLL_REFRESH_SUCCESS = 4;
+    /**
+     * 刷新失败
+     */
     public static final int SCROLL_REFRESH_FAILD = 5;
+    /**
+     * 刷新状态
+     */
     private int scrollStatus;
 
     private CustomRecyclerView mRecyclerView;
@@ -137,6 +158,7 @@ public class ScrollWrapRecycler extends LinearLayout {
         }
         addRefreshView(refreshView);
         isUseSelfRefresh = false;
+        //计算高度并且将刷新的view设置负margin隐藏
         RecyclerView.MarginLayoutParams marginParams = getMarginParams();
         mRefreshView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
         marginParams.topMargin = -mRefreshView.getMeasuredHeight();
@@ -203,13 +225,18 @@ public class ScrollWrapRecycler extends LinearLayout {
      *
      * @param mRefreshView
      */
-    protected void addRefreshView(View mRefreshView) {
+    public void addRefreshView(View mRefreshView) {
         this.isUseSelfRefresh = true;
+        this.mIScrollListener = null;
         if (this.mRefreshView != null) {
             this.mRecyclerView.removeFirstHeadView();
         }
         this.mRefreshView = mRefreshView;
         this.mRecyclerView.addRefreshView(this.mRefreshView);
+        RecyclerView.MarginLayoutParams marginParams = getMarginParams();
+        mRefreshView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        marginParams.topMargin = -mRefreshView.getMeasuredHeight();
+        setRLayoutPramas(marginParams);
     }
 
     /**
@@ -227,6 +254,7 @@ public class ScrollWrapRecycler extends LinearLayout {
     }
 
     public void setRefreshStatus(int status) {
+        this.scrollStatus = status;
         scrollState(status);
         postDelayed(new Runnable() {
             @Override
@@ -275,6 +303,9 @@ public class ScrollWrapRecycler extends LinearLayout {
                         if (scrollStatus == SCROLL_RELEASH) {
                             isRefreshing = true;
                             refresh();
+                            if(mCustomScrollListener!=null){
+                                mCustomScrollListener.scrollState(SCROLL_LOADING);
+                            }
                             scrollState(SCROLL_LOADING);
                         } else {
                             setScrollAnimation();
@@ -312,8 +343,10 @@ public class ScrollWrapRecycler extends LinearLayout {
         if (isUseSelfRefresh) {
             if (mCustomScrollListener != null) {
                 if (scrollMax < mRefreshView.getMeasuredHeight() * 1.2) {
+                    this.scrollStatus = SCROLL_NOTMET;
                     mCustomScrollListener.scrollState(SCROLL_NOTMET);
                 } else if (scrollMax > mRefreshView.getMeasuredHeight() * 1.2) {
+                    this.scrollStatus = SCROLL_RELEASH;
                     mCustomScrollListener.scrollState(SCROLL_RELEASH);
                 }
 //                mCustomScrollListener.scrollState(scrollMax > mRefreshView.getMeasuredHeight());
