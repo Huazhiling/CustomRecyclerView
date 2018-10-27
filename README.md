@@ -1,4 +1,12 @@
 # CustomRecyclerView
+用于减少ScrollView嵌套RecyclerView， 可将View当成头部添加到Rv中
+### 添加Header的样子
+![](https://upload-images.jianshu.io/upload_images/3258838-f26d003341faedb0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+### 添加Footer的样子
+![](https://upload-images.jianshu.io/upload_images/3258838-788295b0a5c0cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+目前已经增加了下拉刷新的逻辑， 上拉加载还在完善中
+
 ## 使用方法
 在build.gradle :project添加
 ```
