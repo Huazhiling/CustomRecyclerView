@@ -5,7 +5,7 @@
     android:background="#00000000"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/m_refresh_hint"

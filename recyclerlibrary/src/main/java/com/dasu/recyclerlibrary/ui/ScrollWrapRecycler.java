@@ -282,7 +282,7 @@ public class ScrollWrapRecycler extends LinearLayout {
                     float move_X = ev.getX();
                     float move_Y = ev.getY();
                     LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                    if (mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y > 0) {
+                    if ((mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y > 0) || mRefreshView == null) {
                         return super.dispatchTouchEvent(ev);
                         //下拉刷新的判断
                     } else if (mRefreshView != null && getMarginParams().topMargin >= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() == 0 && move_Y - start_Y > 0) {
@@ -298,6 +298,7 @@ public class ScrollWrapRecycler extends LinearLayout {
                         return true;
                     } else if (mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight() && layoutManager.findFirstVisibleItemPosition() != 0 && move_Y - start_Y < 0) {
                         getMarginParams().topMargin = -mRefreshView.getMeasuredHeight();
+                        setRLayoutPramas(getMarginParams());
                         return super.dispatchTouchEvent(ev);
                     } else {
                         return super.dispatchTouchEvent(ev);
