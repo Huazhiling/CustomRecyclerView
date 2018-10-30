@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         mCustomRv.addHeadView(getTextView("头部1", Color.parseColor("#CA66F0")));
         mCustomRv.addHeadView(getTextView("头部2", Color.parseColor("#90C56F")));
-        mCustomRv.addHeadView(getTextView("头部3", Color.parseColor("#856fc2")));
         mCustomRv.addHeadView(getTextView("头部4", Color.parseColor("#2cf0bc")));
         mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
         mCustomRv.addFootView(getTextView("尾部2", Color.parseColor("#90C56F")));
@@ -45,13 +44,11 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addLoadMoreView(load);
         mCustomRv.addFootView(getTextView("尾部3", Color.parseColor("#856fc2")));
         mCustomRv.addFootView(getTextView("尾部4", Color.parseColor("#2cf0bc")));
-        mCustomRv.addFootView(getTextView("尾部5", Color.parseColor("#856fc2")));
-        mCustomRv.addFootView(getTextView("尾部6", Color.parseColor("#2cf0bc")));
         mCustomRv.addFootView(getTextView("尾部7", Color.parseColor("#856fc2")));
         mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
         mCustomRv.setAdapter(rvAdapter);
-        refresh = getTextView("刷新3", Color.parseColor("#CCCCCC"));
-        mCustomRv.addRefreshView(refresh);
+//        refresh = getTextView("刷新3", Color.parseColor("#CCCCCC"));
+//        mCustomRv.addRefreshView(refresh);
         mCustomRv.setCustomClickListener(new ICustomClickListener() {
             @Override
             public void onClick(View view, int position, int type, Object... data) {
@@ -63,51 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-//        mCustomRv.setmIScrollListener(new IScrollListener() {
-//            @Override
-//           public void loadmore() {
-//
-//            }
-//
-//            @Override
-//            public void refresh() {
-//                //模拟刷新成功
-//                mCustomRv.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mCustomRv.setRefreshStatus(ScrollWrapRecycler.SCROLL_REFRESH_SUCCESS);
-//                    }
-//                }, 2000);
-//            }
-//        });
-        mCustomRv.setmCustomScrollListener(new ICustomScrollListener() {
+        mCustomRv.setmIScrollListener(new IScrollListener() {
             @Override
-            public void scrollState(int state) {
-                switch (state) {
-                    case ScrollWrapRecycler.SCROLL_NOTSLIPPING:
-                        refresh.setText("等待刷新");
-                        break;
-                    case ScrollWrapRecycler.SCROLL_NOTMET:
-                        refresh.setText("下拉刷新");
-                        break;
-                    case ScrollWrapRecycler.SCROLL_RELEASH:
-                        refresh.setText("松开刷新");
-                        break;
-                    case ScrollWrapRecycler.SCROLL_LOADING:
-                        refresh.setText("正在刷新...");
-                        break;
-                    case ScrollWrapRecycler.SCROLL_REFRESH_SUCCESS:
-                        refresh.setText("刷新成功");
-                        break;
-                    case ScrollWrapRecycler.SCROLL_REFRESH_FAILD:
-                        refresh.setText("刷新失败");
-                        break;
-                }
+           public void loadmore() {
+
             }
 
             @Override
             public void refresh() {
-                Log.e("MainActivity", "模拟刷新");
                 //模拟刷新成功
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
@@ -117,10 +77,47 @@ public class MainActivity extends AppCompatActivity {
                 }, 2000);
             }
         });
+//        mCustomRv.setmCustomScrollListener(new ICustomScrollListener() {
+//            @Override
+//            public void scrollState(int state) {
+//                switch (state) {
+//                    case ScrollWrapRecycler.SCROLL_NOTSLIPPING:
+//                        refresh.setText("等待刷新");
+//                        break;
+//                    case ScrollWrapRecycler.SCROLL_NOTMET:
+//                        refresh.setText("下拉刷新");
+//                        break;
+//                    case ScrollWrapRecycler.SCROLL_RELEASH:
+//                        refresh.setText("松开刷新");
+//                        break;
+//                    case ScrollWrapRecycler.SCROLL_LOADING:
+//                        refresh.setText("正在刷新...");
+//                        break;
+//                    case ScrollWrapRecycler.SCROLL_REFRESH_SUCCESS:
+//                        refresh.setText("刷新成功");
+//                        break;
+//                    case ScrollWrapRecycler.SCROLL_REFRESH_FAILD:
+//                        refresh.setText("刷新失败");
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void refresh() {
+//                Log.e("MainActivity", "模拟刷新");
+//                //模拟刷新成功
+//                mCustomRv.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mCustomRv.setRefreshStatus(ScrollWrapRecycler.SCROLL_REFRESH_SUCCESS);
+//                    }
+//                }, 2000);
+//            }
+//        });
         /**
          * 添加数据源
          */
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 8; i++) {
             mData.add("mData --- " + i);
         }
     }

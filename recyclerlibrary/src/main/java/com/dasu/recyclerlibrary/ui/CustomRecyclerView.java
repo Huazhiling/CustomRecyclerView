@@ -136,8 +136,8 @@ class CustomRecyclerView extends RecyclerView {
         /**
          * 设置头尾的两个缓存为size  变相解决复用问题
          */
-        getRecycledViewPool().setMaxRecycledViews(ViewConfig.FOOTVIEW_TYPE, mFootCouListInfo.size());
-        getRecycledViewPool().setMaxRecycledViews(ViewConfig.HEADVIEW_TYPE, mHeadCouListInfo.size());
+        getRecycledViewPool().setMaxRecycledViews(ViewConfig.FOOTVIEW_TYPE, mFootCouListInfo.size() + 1);
+        getRecycledViewPool().setMaxRecycledViews(ViewConfig.HEADVIEW_TYPE, mHeadCouListInfo.size() + 1);
         //现在交给scroolwrap处理
 //        /**
 //         * 计算高度

@@ -92,8 +92,6 @@ public class ScrollWrapRecycler extends LinearLayout {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float animatedValue = (float) animation.getAnimatedValue();
-                Log.e("ScroolWrapRecycler", "animatedValue:" + animatedValue);
-                Log.e("ScroolWrapRecycler", "-mRefreshView.getMeasuredHeight():" + -mRefreshView.getMeasuredHeight());
                 if (animatedValue < -mRefreshView.getMeasuredHeight()) {
                     animatedValue = mRefreshView.getMeasuredHeight();
                 }
@@ -232,9 +230,12 @@ public class ScrollWrapRecycler extends LinearLayout {
             this.mRecyclerView.removeFirstHeadView();
         }
         this.mRefreshView = mRefreshView;
-        this.mRecyclerView.addRefreshView(this.mRefreshView);
         RecyclerView.MarginLayoutParams marginParams = getMarginParams();
         mRefreshView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        if (mRefreshView.getMeasuredHeight() > 500) {
+            throw new RuntimeException("refreshView 的height太大");
+        }
+        this.mRecyclerView.addRefreshView(this.mRefreshView);
         marginParams.topMargin = -mRefreshView.getMeasuredHeight();
         setRLayoutPramas(marginParams);
     }
@@ -255,14 +256,18 @@ public class ScrollWrapRecycler extends LinearLayout {
 
     public void setRefreshStatus(int status) {
         this.scrollStatus = status;
-        scrollState(status);
+        if (isUseSelfRefresh) {
+            mCustomScrollListener.scrollState(status);
+        } else {
+            scrollState(status);
+        }
         postDelayed(new Runnable() {
             @Override
             public void run() {
-                setScrollAnimation();
+                setScrollAnimation(-mRefreshView.getMeasuredHeight());
                 isRefreshing = false;
             }
-        }, 1500);
+        }, 500);
     }
 
     @Override
@@ -303,12 +308,13 @@ public class ScrollWrapRecycler extends LinearLayout {
                         if (scrollStatus == SCROLL_RELEASH) {
                             isRefreshing = true;
                             refresh();
-                            if(mCustomScrollListener!=null){
+                            if (mCustomScrollListener != null) {
                                 mCustomScrollListener.scrollState(SCROLL_LOADING);
                             }
+                            setScrollAnimation((int) (mRefreshView.getMeasuredHeight() * 1.2));
                             scrollState(SCROLL_LOADING);
                         } else {
-                            setScrollAnimation();
+                            setScrollAnimation(-mRefreshView.getMeasuredHeight());
                         }
                     }
                     break;
@@ -333,11 +339,11 @@ public class ScrollWrapRecycler extends LinearLayout {
         RecyclerView.MarginLayoutParams marginParams = getMarginParams();
         int scrollMax = marginParams.topMargin + (int) (phaseDiff);
         if (phaseDiff > 0) {
-            scrollMax = scrollMax > mRefreshView.getMeasuredHeight() * 3 ? mRefreshView.getMeasuredHeight() * 3 : scrollMax;
+            scrollMax = scrollMax > mRefreshView.getMeasuredHeight() * 2.8 ? (int) (mRefreshView.getMeasuredHeight() * 2.8) : scrollMax;
         } else {
             scrollMax = scrollMax < -mRefreshView.getMeasuredHeight() ? -mRefreshView.getMeasuredHeight() : scrollMax;
         }
-        Log.e("ScroolWrapRecycler", "scrollMax:" + scrollMax);
+        Log.e("ScrollWrapRecycler", "scrollMax:" + scrollMax);
         marginParams.topMargin = scrollMax;
         setRLayoutPramas(marginParams);
         if (isUseSelfRefresh) {
@@ -352,9 +358,9 @@ public class ScrollWrapRecycler extends LinearLayout {
 //                mCustomScrollListener.scrollState(scrollMax > mRefreshView.getMeasuredHeight());
             }
         } else {
-            if (scrollMax < mRefreshView.getMeasuredHeight() * 1.5) {
+            if (scrollMax < mRefreshView.getMeasuredHeight() * 1.2) {
                 this.scrollState(SCROLL_NOTMET);
-            } else if (scrollMax > mRefreshView.getMeasuredHeight() * 1.5) {
+            } else if (scrollMax > mRefreshView.getMeasuredHeight() * 1.2) {
                 this.scrollState(SCROLL_RELEASH);
             }
         }
@@ -393,8 +399,8 @@ public class ScrollWrapRecycler extends LinearLayout {
         return (MarginLayoutParams) mRecyclerView.getLayoutParams();
     }
 
-    public void setScrollAnimation() {
-        PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getMarginParams().topMargin, -mRefreshView.getMeasuredHeight());
+    public void setScrollAnimation(int height) {
+        PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getMarginParams().topMargin, height);
         animator.setValues(valuesHolder);
         animator.setDuration(300);
         animator.start();
