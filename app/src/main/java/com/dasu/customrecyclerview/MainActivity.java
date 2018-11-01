@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addHeadView(getTextView("头部1", Color.parseColor("#CA66F0")));
         mCustomRv.addHeadView(getTextView("头部2", Color.parseColor("#90C56F")));
         mCustomRv.addHeadView(getTextView("头部4", Color.parseColor("#2cf0bc")));
-        mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
+//        mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
         mCustomRv.addFootView(getTextView("尾部2", Color.parseColor("#90C56F")));
         final TextView load = getTextView("加载", Color.parseColor("#CCCCCC"));
         mCustomRv.addLoadMoreView(load);

@@ -4,6 +4,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -66,6 +67,8 @@ public class ScrollWrapRecycler extends LinearLayout {
     private ValueAnimator animator;
     private boolean isRefreshing = false;
     private int scroolRemaining = 0;
+    private boolean isFootViewVisibility = false;
+
 
     public ScrollWrapRecycler(Context context) {
         this(context, null);
@@ -104,21 +107,42 @@ public class ScrollWrapRecycler extends LinearLayout {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 scroolRemaining += dy;
-                Log.e("ScrollWrapRecycler", "dy:" + dy);
+                if (!isFootViewVisibility) {
+                    int lastVisibleItemPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastVisibleItemPosition();
+                    if (getAdapter() != null) {
+                        Log.d("ScrollWrapRecycler", "getAdapter().getItemCount():" + getFullSize());
+                        if (getFullSize() <= lastVisibleItemPosition) {
+                            mLoadMoreView.setVisibility(GONE);
+                        } else {
+                            mLoadMoreView.setVisibility(VISIBLE);
+                        }
+                    }
+                    isFootViewVisibility = true;
+                }
             }
         });
     }
 
     public void setmCustomScrollListener(ICustomScrollListener mCustomScrollListener) {
         if (mIScrollListener != null) {
-            throw new RuntimeException("不能同时设置两个监听器，请移除IScrollListener");
+            mIScrollListener = null;
         }
         this.mCustomScrollListener = mCustomScrollListener;
     }
 
+    /**
+     * 获取RecyclerView实际大小，返回值为HeadSize+content+FootSize-Refresh-Loadmore
+     * 不包含刷新和加载的个数返回，如果需要返回全部，调用{#getAdapter().getItemCount()}
+     *
+     * @return
+     */
+    public int getFullSize() {
+        return getAdapter().getItemCount() - (mRefreshView == null ? 0 : 1) - (mLoadMoreView == null ? 0 : 1);
+    }
+
     public void setmIScrollListener(IScrollListener mIScrollListener) {
         if (mCustomScrollListener != null) {
-            throw new RuntimeException("不能同时设置两个监听器，请移除ICustomScrollListener");
+            mCustomScrollListener = null;
         }
         this.mIScrollListener = mIScrollListener;
     }
@@ -459,4 +483,5 @@ public class ScrollWrapRecycler extends LinearLayout {
     public void notifyItemRemoved(int positionStart) {
         this.getAdapter().notifyItemRemoved(positionStart);
     }
+
 }
