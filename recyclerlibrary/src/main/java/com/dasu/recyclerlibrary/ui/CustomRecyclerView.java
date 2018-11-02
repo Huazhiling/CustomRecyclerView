@@ -21,8 +21,6 @@ class CustomRecyclerView extends RecyclerView {
     private int footCount;  //记录foot的个数
     private Adapter mAdapter; //adapter，可能是customadapter， 可能是自定义adapter
     private Context mContext;
-    private boolean isRefresh;
-    private boolean isLoadMore;
     private View mRefreshView;
     private View mLoadMoreView;
     private ICustomClickListener customClickListener;
@@ -210,34 +208,6 @@ class CustomRecyclerView extends RecyclerView {
     public void setCustomClickListener(ICustomClickListener customClickListener) {
         this.customClickListener = customClickListener;
         getHeadAndFootAdapter().setCustomClickListener(customClickListener);
-    }
-
-    /**
-     * 设置是否允许刷新
-     *
-     * @param refresh
-     */
-    public void setRefresh(boolean refresh) {
-        this.isRefresh = refresh;
-    }
-
-    /**
-     * 设置是否允许加载
-     *
-     * @param loadMore
-     */
-    public void setLoadMore(boolean loadMore) {
-        this.isLoadMore = loadMore;
-    }
-
-    /**
-     * 同时设置
-     *
-     * @param isRefALoad
-     */
-    public void setRefreshAndLoadMore(boolean isRefALoad) {
-        this.isRefresh = isRefALoad;
-        this.isLoadMore = isRefALoad;
     }
 
     /**
