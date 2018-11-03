@@ -14,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Scroller;
 import android.widget.TextView;
 
 import com.dasu.recyclerlibrary.R;
@@ -73,7 +72,6 @@ public class ScrollWrapRecycler extends LinearLayout {
 
     private View mRefreshView;
     private View mLoadMoreView;
-    private Scroller mScroll;
     private TextView mRefreshHint;
     private TextView mLoadMoreHint;
     private CustomRecyclerView mRecyclerView;
@@ -127,11 +125,10 @@ public class ScrollWrapRecycler extends LinearLayout {
     }
 
     private void init(Context context) {
+        setOrientation(VERTICAL);
         this.mRecyclerView = new CustomRecyclerView(context);
         this.mRecyclerView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        this.mScroll = new Scroller(context);
         this.mContext = context;
-        addView(mRecyclerView);
         refreshAnimator = new ValueAnimator();
         loadmoreAnimator = new ValueAnimator();
         refreshAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -141,8 +138,8 @@ public class ScrollWrapRecycler extends LinearLayout {
                 if (animatedValue < -mRefreshView.getMeasuredHeight()) {
                     animatedValue = mRefreshView.getMeasuredHeight();
                 }
-                getMarginParams().topMargin = (int) animatedValue;
-                mRecyclerView.setLayoutParams(getMarginParams());
+                getMarginParams(mRefreshView).topMargin = (int) animatedValue;
+                mRecyclerView.setLayoutParams(getMarginParams(mRefreshView));
             }
         });
         loadmoreAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -153,8 +150,8 @@ public class ScrollWrapRecycler extends LinearLayout {
                     animatedValue = mLoadMoreView.getMeasuredHeight();
                 }
                 mLoadMoreView.setVisibility(VISIBLE);
-                getMarginParams().bottomMargin = (int) animatedValue;
-                mRecyclerView.setLayoutParams(getMarginParams());
+                getMarginParams(mLoadMoreView).bottomMargin = (int) animatedValue;
+                mRecyclerView.setLayoutParams(getMarginParams(mLoadMoreView));
             }
         });
         loadmoreAnimator.addListener(new Animator.AnimatorListener() {
@@ -284,12 +281,26 @@ public class ScrollWrapRecycler extends LinearLayout {
         isUseSelfRefresh = false;
         isUseSelfLoadMore = false;
         //计算高度并且将刷新的view设置负margin隐藏
-        RecyclerView.MarginLayoutParams marginParams = getMarginParams();
+//        RecyclerView.MarginLayoutParams marginParams = getMarginParams();
+//        mRefreshView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+//        mLoadMoreView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+//        marginParams.topMargin = -mRefreshView.getMeasuredHeight();
+//        setRLayoutPramas(marginParams);
+        addView(mRefreshView);
+        addView(mRecyclerView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        addView(mLoadMoreView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        this.mRecyclerView.setAdapter(adapter);
+        viewLayout();
+    }
+
+    /**
+     * 改变View的位置
+     */
+    private void viewLayout() {
         mRefreshView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
         mLoadMoreView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-        marginParams.topMargin = -mRefreshView.getMeasuredHeight();
-        setRLayoutPramas(marginParams);
-        this.mRecyclerView.setAdapter(adapter);
+        getMarginParams(mRefreshView).topMargin = -mRefreshView.getMeasuredHeight();
+        getMarginParams(mLoadMoreView).bottomMargin = -mLoadMoreView.getMeasuredHeight();
     }
 
     /**
@@ -336,18 +347,7 @@ public class ScrollWrapRecycler extends LinearLayout {
     public void addRefreshView(View mRefreshView) {
         this.isUseSelfRefresh = true;
         this.mIScrollListener = null;
-        if (this.mRefreshView != null) {
-            this.mRecyclerView.removeFirstHeadView();
-        }
         this.mRefreshView = mRefreshView;
-        RecyclerView.MarginLayoutParams marginParams = getMarginParams();
-        mRefreshView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-        if (mRefreshView.getMeasuredHeight() > 500) {
-            throw new RuntimeException("refreshView 的height太大");
-        }
-        this.mRecyclerView.addRefreshView(this.mRefreshView);
-        marginParams.topMargin = -mRefreshView.getMeasuredHeight();
-        setRLayoutPramas(marginParams);
     }
 
     /**
@@ -358,12 +358,7 @@ public class ScrollWrapRecycler extends LinearLayout {
     public void addLoadMoreView(View mLoadMoreView) {
         this.isUseSelfLoadMore = true;
         this.mIScrollListener = null;
-        if (this.mLoadMoreView != null) {
-            this.mRecyclerView.removeLastFootView(foorIndex);
-        }
         this.mLoadMoreView = mLoadMoreView;
-        this.foorIndex = this.mRecyclerView.getmFootCouListInfo().size(); //不需要-1  应为这个时候新的foot还没有添加进去
-        addFootView(this.mLoadMoreView);
     }
 
     /**
@@ -408,109 +403,111 @@ public class ScrollWrapRecycler extends LinearLayout {
         }, 500);
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (!isRefreshing && !isLoadMored) {
-            switch (ev.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    start_X = (int) ev.getX();
-                    start_Y = (int) ev.getY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    float move_X = ev.getX();
-                    float move_Y = ev.getY();
-                    isUpdateFoot = false;
-                    /**
-                     * 如果没有刷新的View  或者刷新的View <= view的高度负值  证明刷新的view已经还原  这时候执行recycler的滑动
-                     */
-//                    View childAt = layoutManager.getChildAt(1);
-                    /**
-                     * 每次进来时先全部置为false  且isRefreshStatus与isLoadMoreStatus为互斥状态  isLoadMoreStatus为true，则且isRefreshStatus为false，反之一样
-                     */
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                    if ((mRefreshView != null && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight()
-                            && scroolRemaining > 0 && move_Y - start_Y > 0 && (!isFootViewVisibility || getFullSize() + 1 != lastVisibleItemPosition))
-                            || mRefreshView == null) {
-                        start_Y = move_Y;
-                        isRefreshStatus = false;
-                        isLoadMoreStatus = false;
-                        return super.dispatchTouchEvent(ev);
-                    } else if (mRefreshView != null && getMarginParams().topMargin >= -mRefreshView.getMeasuredHeight()
-                            && scroolRemaining <= 0 && move_Y - start_Y > 0 && (!isFootViewVisibility || getFullSize() + 1 != lastVisibleItemPosition)) {
-                        float phaseDiff = move_Y - start_Y;
-                        updateHead((float) (phaseDiff / 1.5));
-                        start_Y = move_Y;
-                        return true;
-                        //如果getMarginParams().topMargin > -refresh的高度  证明下拉了 需要先还原  还原下拉刷新的margin
-                    } else if (mRefreshView != null && getMarginParams().topMargin > -mRefreshView.getMeasuredHeight()
-                            && scroolRemaining <= 0 && move_Y - start_Y < 0 && (!isFootViewVisibility || getFullSize() + 1 != lastVisibleItemPosition)) {
-                        float phaseDiff = move_Y - start_Y;
-                        updateHead((float) (phaseDiff * 1.5));
-                        start_Y = move_Y;
-                        return true;
-                    } else if (isFootViewVisibility && getMarginParams().topMargin <= -mRefreshView.getMeasuredHeight()
-                            && scroolRemaining > 0
-                            && getFullSize() + 1 == layoutManager.findLastCompletelyVisibleItemPosition()/* && move_Y - start_Y < 0*/) {
-                        mLoadMoreView.setVisibility(VISIBLE);
-                        if (move_Y - start_Y > 0) {
-                            float phaseDiff = move_Y - start_Y;
-                            updateFoot((float) (phaseDiff / 1.5));
-                        } else {
-                            float phaseDiff = move_Y - start_Y;
-                            updateFoot((float) (phaseDiff / 1.5));
-                        }
-                        start_Y = move_Y;
-                        return true;
-                    } else {
-                        start_Y = move_Y;
-//                        getMarginParams().topMargin = -mRefreshView.getMeasuredHeight();
-//                        getMarginParams().bottomMargin = 0;
-//                        setRLayoutPramas(getMarginParams());
-                        return super.dispatchTouchEvent(ev);
-                    }
-                case MotionEvent.ACTION_CANCEL:
-                case MotionEvent.ACTION_UP:
-                    if (isRefreshStatus) {
-                        if (mRefreshView != null) {
-                            if (refreshScrollStatus == SCROLL_RL_REFRESH) {
-                                isRefreshing = true;
-                                refresh();
-                                if (mCustomScrollListener != null && isUseSelfRefresh) {
-                                    mCustomScrollListener.scrollRefreshState(SCROLL_RL_LOADING);
-                                } else {
-                                    scrollRefreshState(SCROLL_RL_LOADING);
-                                }
-                                setRefreshScrollAnimation((int) (mRefreshView.getMeasuredHeight() * 1.2));
-                            } else {
-                                setRefreshScrollAnimation(-mRefreshView.getMeasuredHeight());
-                            }
-                        }
-                    } else if (isLoadMoreStatus) {
-                        if (mLoadMoreView != null) {
-                            if (loadMoreScrollStatus == SCROLL_RL_REFRESH) {
-                                isLoadMored = true;
-                                loadMore();
-                                if (mCustomScrollListener != null && isUseSelfLoadMore) {
-                                    mCustomScrollListener.scrollLoadMoreState(SCROLL_RL_LOADING);
-                                } else {
-                                    scrollLoadMoreState(SCROLL_RL_LOADING);
-                                }
-                                setLoadMoreScrollAnimation(mLoadMoreView.getMeasuredHeight());
-                            } else {
-                                setLoadMoreScrollAnimation(-mLoadMoreView.getMeasuredHeight() - 1);
-                            }
-                        }
-                    }
-                    isLoadMoreStatus = false;
-                    isRefreshStatus = false;
-                    break;
-            }
-        } else {
-            return true;
-        }
-        return super.dispatchTouchEvent(ev);
-    }
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        if (!isRefreshing && !isLoadMored) {
+//            switch (ev.getAction()) {
+//                case MotionEvent.ACTION_DOWN:
+//                    start_X = (int) ev.getX();
+//                    start_Y = (int) ev.getY();
+//                    break;
+//                case MotionEvent.ACTION_MOVE:
+//                    float move_X = ev.getX();
+//                    float move_Y = ev.getY();
+//                    isUpdateFoot = false;
+//                    /*
+//                     * 如果没有刷新的View  或者刷新的View <= view的高度负值  证明刷新的view已经还原  这时候执行recycler的滑动
+//                     */
+////                    View childAt = layoutManager.getChildAt(1);
+//                    /*
+//                     * 每次进来时先全部置为false  且isRefreshStatus与isLoadMoreStatus为互斥状态  isLoadMoreStatus为true，则且isRefreshStatus为false，反之一样
+//                     */
+//                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+//                    Log.e("ScrollWrapRecycler", "getFullSize() + 1:" + (getFullSize() + 1));
+//                    Log.e("ScrollWrapRecycler", "layoutManager.findLastCompletelyVisibleItemPosition():" + layoutManager.findLastCompletelyVisibleItemPosition());
+//                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+//                    if ((mRefreshView != null && getMarginParams(mRefreshView).topMargin <= -mRefreshView.getMeasuredHeight()
+//                            && scroolRemaining > 0 && move_Y - start_Y > 0 && (!isFootViewVisibility || getFullSize() + 1 != lastVisibleItemPosition))
+//                            || mRefreshView == null) {
+//                        start_Y = move_Y;
+//                        isRefreshStatus = false;
+//                        isLoadMoreStatus = false;
+//                        return super.dispatchTouchEvent(ev);
+//                    } else if (mRefreshView != null && getMarginParams(mRefreshView).topMargin >= -mRefreshView.getMeasuredHeight()
+//                            && scroolRemaining <= 0 && move_Y - start_Y > 0 && (!isFootViewVisibility || getFullSize() + 1 != lastVisibleItemPosition)) {
+//                        float phaseDiff = move_Y - start_Y;
+//                        updateHead((float) (phaseDiff / 1.5));
+//                        start_Y = move_Y;
+//                        return true;
+//                        //如果getMarginParams().topMargin > -refresh的高度  证明下拉了 需要先还原  还原下拉刷新的margin
+//                    } else if (mRefreshView != null && getMarginParams(mRefreshView).topMargin > -mRefreshView.getMeasuredHeight()
+//                            && scroolRemaining <= 0 && move_Y - start_Y < 0 && (!isFootViewVisibility || getFullSize() + 1 != lastVisibleItemPosition)) {
+//                        float phaseDiff = move_Y - start_Y;
+//                        updateHead((float) (phaseDiff * 1.5));
+//                        start_Y = move_Y;
+//                        return true;
+//                    } else if (isFootViewVisibility && getMarginParams(mRefreshView).topMargin <= -mRefreshView.getMeasuredHeight()
+//                            && scroolRemaining > 0
+//                            && getFullSize() + 1 == layoutManager.findLastCompletelyVisibleItemPosition()/* && move_Y - start_Y < 0*/) {
+//                        mLoadMoreView.setVisibility(VISIBLE);
+//                        if (move_Y - start_Y > 0) {
+//                            float phaseDiff = move_Y - start_Y;
+//                            updateFoot((float) (phaseDiff / 1.5));
+//                        } else {
+//                            float phaseDiff = move_Y - start_Y;
+//                            updateFoot((float) (phaseDiff / 1.5));
+//                        }
+//                        start_Y = move_Y;
+//                        return true;
+//                    } else {
+//                        start_Y = move_Y;
+////                        getMarginParams().topMargin = -mRefreshView.getMeasuredHeight();
+////                        getMarginParams().bottomMargin = 0;
+////                        setRLayoutPramas(getMarginParams());
+//                        return super.dispatchTouchEvent(ev);
+//                    }
+//                case MotionEvent.ACTION_CANCEL:
+//                case MotionEvent.ACTION_UP:
+//                    if (isRefreshStatus) {
+//                        if (mRefreshView != null) {
+//                            if (refreshScrollStatus == SCROLL_RL_REFRESH) {
+//                                isRefreshing = true;
+//                                refresh();
+//                                if (mCustomScrollListener != null && isUseSelfRefresh) {
+//                                    mCustomScrollListener.scrollRefreshState(SCROLL_RL_LOADING);
+//                                } else {
+//                                    scrollRefreshState(SCROLL_RL_LOADING);
+//                                }
+//                                setRefreshScrollAnimation((int) (mRefreshView.getMeasuredHeight() * 1.2));
+//                            } else {
+//                                setRefreshScrollAnimation(-mRefreshView.getMeasuredHeight());
+//                            }
+//                        }
+//                    } else if (isLoadMoreStatus) {
+//                        if (mLoadMoreView != null) {
+//                            if (loadMoreScrollStatus == SCROLL_RL_REFRESH) {
+//                                isLoadMored = true;
+//                                loadMore();
+//                                if (mCustomScrollListener != null && isUseSelfLoadMore) {
+//                                    mCustomScrollListener.scrollLoadMoreState(SCROLL_RL_LOADING);
+//                                } else {
+//                                    scrollLoadMoreState(SCROLL_RL_LOADING);
+//                                }
+//                                setLoadMoreScrollAnimation(mLoadMoreView.getMeasuredHeight());
+//                            } else {
+//                                setLoadMoreScrollAnimation(-mLoadMoreView.getMeasuredHeight() - 1);
+//                            }
+//                        }
+//                    }
+//                    isLoadMoreStatus = false;
+//                    isRefreshStatus = false;
+//                    break;
+//            }
+//        } else {
+//            return true;
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
 
     private void refresh() {
         if (mCustomScrollListener != null) {
@@ -541,7 +538,7 @@ public class ScrollWrapRecycler extends LinearLayout {
         isUpdateFoot = true;
         isLoadMoreStatus = true;
         isRefreshStatus = false;
-        RecyclerView.MarginLayoutParams marginParams = getMarginParams();
+        RecyclerView.MarginLayoutParams marginParams = getMarginParams(mLoadMoreView);
         int scrollMax = marginParams.bottomMargin - (int) (phaseDiff);
         if (phaseDiff < 0) {
             scrollMax = scrollMax > mLoadMoreView.getMeasuredHeight() * 2.4 ? (int) (mLoadMoreView.getMeasuredHeight() * 2.4) : scrollMax;
@@ -578,7 +575,7 @@ public class ScrollWrapRecycler extends LinearLayout {
     private void updateHead(float phaseDiff) {
         isRefreshStatus = true;
         isLoadMoreStatus = false;
-        RecyclerView.MarginLayoutParams marginParams = getMarginParams();
+        RecyclerView.MarginLayoutParams marginParams = getMarginParams(mRefreshView);
         int scrollMax = marginParams.topMargin + (int) (phaseDiff);
         if (phaseDiff > 0) {
             scrollMax = scrollMax > mRefreshView.getMeasuredHeight() * 2.4 ? (int) (mRefreshView.getMeasuredHeight() * 2.4) : scrollMax;
@@ -666,21 +663,19 @@ public class ScrollWrapRecycler extends LinearLayout {
         this.loadMoreScrollStatus = scrollReleash;
     }
 
-    private RecyclerView.MarginLayoutParams getMarginParams() {
-        return (MarginLayoutParams) mRecyclerView.getLayoutParams();
+    private RecyclerView.MarginLayoutParams getMarginParams(View view) {
+        return (MarginLayoutParams) view.getLayoutParams();
     }
 
     public void setRefreshScrollAnimation(int height) {
-        PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getMarginParams().topMargin, height);
+        PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getMarginParams(mRefreshView).topMargin, height);
         refreshAnimator.setValues(valuesHolder);
         refreshAnimator.setDuration(300);
         refreshAnimator.start();
     }
 
     public void setLoadMoreScrollAnimation(int height) {
-        Log.e("ScrollWrapRecycler", "getMarginParams().bottomMargin:" + getMarginParams().bottomMargin);
-        Log.e("ScrollWrapRecycler", "height:" + height);
-        PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getMarginParams().bottomMargin, height);
+        PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getMarginParams(mLoadMoreView).bottomMargin, height);
         loadmoreAnimator.setValues(valuesHolder);
         loadmoreAnimator.setDuration(300);
         loadmoreAnimator.start();

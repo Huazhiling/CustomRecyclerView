@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addFootView(getTextView("尾部3", Color.parseColor("#856fc2")));
         mCustomRv.addFootView(getTextView("尾部4", Color.parseColor("#2cf0bc")));
         mCustomRv.addFootView(getTextView("尾部7", Color.parseColor("#856fc2")));
-        mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
+//        mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
         mCustomRv.setAdapter(rvAdapter);
 //        refresh = getTextView("刷新3", Color.parseColor("#CCCCCC"));
 //        mCustomRv.addRefreshView(refresh);
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         });
         mCustomRv.setmIScrollListener(new IScrollListener() {
             @Override
-           public void loadMore() {
+            public void loadMore() {
 
             }
 

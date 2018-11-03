@@ -21,10 +21,7 @@ class CustomRecyclerView extends RecyclerView {
     private int footCount;  //记录foot的个数
     private Adapter mAdapter; //adapter，可能是customadapter， 可能是自定义adapter
     private Context mContext;
-    private View mRefreshView;
-    private View mLoadMoreView;
     private ICustomClickListener customClickListener;
-    int start_X, start_Y = 0;
 
     public CustomRecyclerView(@NonNull Context context) {
         this(context, null);
@@ -53,22 +50,6 @@ class CustomRecyclerView extends RecyclerView {
         return mFootCouListInfo;
     }
 
-    public void addRefreshView(View mRefreshView) {
-//        if (this.mRefreshView != null) {
-//            return;
-//        }
-        this.mRefreshView = mRefreshView;
-        addHeadView(this.mRefreshView);
-    }
-
-    public void addLoadMoreView(View mLoadMoreView) {
-//        if (this.mLoadMoreView != null) {
-//            return;
-//        }
-        this.mLoadMoreView = mLoadMoreView;
-        addFootView(this.mLoadMoreView);
-    }
-
     /**
      * 添加HeadView的方法
      *
@@ -81,16 +62,7 @@ class CustomRecyclerView extends RecyclerView {
 
     public void addHeadView(View view, boolean isCache) {
         headCount++;
-        int index = 0; //默认添加位置为0
-        if (mHeadCouListInfo.size() != 0) {
-//            View contentView = mHeadCouListInfo.get(0).getContentView();
-            if (view.equals(this.mRefreshView)) {
-                index = 0;
-            } else {
-                index = headCount - 1;
-            }
-        }
-        setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000, index, isCache);
+        setHeadViewConfig(view, ViewConfig.HEADVIEW, headCount, 100000, isCache);
         if (mAdapter != null) {
             if (!(mAdapter instanceof CustomAdapter)) {
                 wrapHeadAdapter();
@@ -100,16 +72,7 @@ class CustomRecyclerView extends RecyclerView {
 
     public void addFootView(View view) {
         footCount++;
-        int index = 0;
-        if (mFootCouListInfo.size() != 0) {
-            View contentView = mFootCouListInfo.get(mFootCouListInfo.size() - 1).getContentView();
-            if (contentView.equals(this.mLoadMoreView)) {
-                index = mFootCouListInfo.size() - 1;
-            } else {
-                index = mFootCouListInfo.size();
-            }
-        }
-        setFootViewConfig(view, ViewConfig.FOOTVIEW, footCount, 100000, index);
+        setFootViewConfig(view, ViewConfig.FOOTVIEW, footCount, 100000);
         if (mAdapter != null) {
             if (!(mAdapter instanceof CustomAdapter)) {
                 wrapHeadAdapter();
@@ -148,13 +111,6 @@ class CustomRecyclerView extends RecyclerView {
         super.setAdapter(mAdapter);
     }
 
-    private int getRefreshHeight() {
-        int width = View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-        int height = View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-        mRefreshView.measure(width, height);
-        return -mRefreshView.getMeasuredHeight();
-    }
-
     /**
      * 配置头部view的信息
      *
@@ -162,10 +118,9 @@ class CustomRecyclerView extends RecyclerView {
      * @param type
      * @param count
      * @param headCount
-     * @param index
      * @param isCache
      */
-    private void setHeadViewConfig(View view, String type, int count, int headCount, int index, boolean isCache) {
+    private void setHeadViewConfig(View view, String type, int count, int headCount, boolean isCache) {
         ViewConfig viewConfig = new ViewConfig();
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
@@ -176,7 +131,7 @@ class CustomRecyclerView extends RecyclerView {
             mHeadParent.removeView(view);
         }
         viewConfig.setContentView(view);
-        mHeadCouListInfo.add(index, viewConfig);
+        mHeadCouListInfo.add(viewConfig);
     }
 
     /**
@@ -187,7 +142,7 @@ class CustomRecyclerView extends RecyclerView {
      * @param count
      * @param headCount
      */
-    private void setFootViewConfig(View view, String type, int count, int headCount, int index) {
+    private void setFootViewConfig(View view, String type, int count, int headCount) {
         ViewConfig viewConfig = new ViewConfig();
         viewConfig.setTag(view.getClass() + type + count);
         viewConfig.setType(headCount);
@@ -197,7 +152,7 @@ class CustomRecyclerView extends RecyclerView {
             mFootParent.removeView(view);
         }
         viewConfig.setContentView(view);
-        mFootCouListInfo.add(index, viewConfig);
+        mFootCouListInfo.add(viewConfig);
     }
 
     public CustomAdapter getHeadAndFootAdapter() {
