@@ -1,5 +1,5 @@
 # CustomRecyclerView
-用于减少ScrollView嵌套RecyclerView， 可将View当成头部添加到Rv中
+用于减少ScrollView嵌套RecyclerView， 可将View当成头部添加到Rv中，同时可设置刷新加载，可采用默认的刷新加载也可使用自定义的，但是目前仅支持简单的刷新加载View
 ### 添加Header的样子
 ![](https://upload-images.jianshu.io/upload_images/3258838-f26d003341faedb0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 ### 添加Footer的样子
