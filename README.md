@@ -5,7 +5,7 @@
 ### 添加Footer的样子
 ![](https://upload-images.jianshu.io/upload_images/3258838-788295b0a5c0cfa5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-目前已经增加了下拉刷新的逻辑， 上拉加载还在完善中
+目前已经增加了下拉刷新以及上拉加载的逻辑
 
 ## 使用方法
 在build.gradle :project添加
