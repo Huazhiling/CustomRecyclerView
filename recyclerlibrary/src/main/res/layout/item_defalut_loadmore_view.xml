@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/m_loadmore_hint"
     android:background="#00000000"
     android:gravity="center"
-    android:orientation="vertical"
+    android:text="上拉加载"
+    android:textSize="15sp"
     android:padding="12dp">
-
-    <TextView
-        android:id="@+id/m_loadmore_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="上拉加载"
-        android:textSize="15sp" />
-</LinearLayout>
+</TextView>

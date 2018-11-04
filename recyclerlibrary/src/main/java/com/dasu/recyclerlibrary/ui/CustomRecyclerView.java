@@ -14,6 +14,10 @@ import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 
 import java.util.ArrayList;
 
+/**
+ * 2018.11.4
+ * 自定义RecyclerView，主要用于添加不同类型的Head和Foot
+ */
 class CustomRecyclerView extends RecyclerView {
     private ArrayList<ViewConfig> mHeadCouListInfo; //保存头部的view
     private ArrayList<ViewConfig> mFootCouListInfo; //保存尾部的view

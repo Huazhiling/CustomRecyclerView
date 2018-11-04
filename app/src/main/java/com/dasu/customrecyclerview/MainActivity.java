@@ -19,10 +19,19 @@ import com.dasu.recyclerlibrary.ui.ScrollWrapRecycler;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_FAILD;
+import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_LOADING;
+import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_NOTMET;
+import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_NOTSLIPPING;
+import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_REFRESH;
+import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_SUCCESS;
+
+
 public class MainActivity extends AppCompatActivity {
     private ScrollWrapRecycler mCustomRv;
     private List<String> mData;
     private TextView refresh;
+    private TextView load;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addHeadView(getTextView("头部4", Color.parseColor("#2cf0bc")));
         mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
         mCustomRv.addFootView(getTextView("尾部2", Color.parseColor("#90C56F")));
-        final TextView load = getTextView("加载", Color.parseColor("#CCCCCC"));
+        load = getTextView("加载", Color.parseColor("#CCCCCC"));
         mCustomRv.addLoadMoreView(load);
         mCustomRv.addFootView(getTextView("尾部3", Color.parseColor("#856fc2")));
         mCustomRv.addFootView(getTextView("尾部4", Color.parseColor("#2cf0bc")));
@@ -62,7 +71,13 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.setmIScrollListener(new IScrollListener() {
             @Override
             public void loadMore() {
-
+                //模拟加载成功
+                mCustomRv.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCustomRv.setLoadMoreStatus(SCROLL_RL_SUCCESS);
+                    }
+                }, 2000);
             }
 
             @Override
@@ -71,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mCustomRv.setRefreshStatus(ScrollWrapRecycler.SCROLL_RL_SUCCESS);
+                        mCustomRv.setRefreshStatus(SCROLL_RL_SUCCESS);
                     }
                 }, 2000);
             }
@@ -80,22 +95,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void scrollRefreshState(int state) {
                 switch (state) {
-                    case ScrollWrapRecycler.SCROLL_RL_NOTSLIPPING:
+                    case SCROLL_RL_NOTSLIPPING:
                         refresh.setText("等待刷新");
                         break;
-                    case ScrollWrapRecycler.SCROLL_RL_NOTMET:
+                    case SCROLL_RL_NOTMET:
                         refresh.setText("下拉刷新");
                         break;
-                    case ScrollWrapRecycler.SCROLL_RL_REFRESH:
+                    case SCROLL_RL_REFRESH:
                         refresh.setText("松开刷新");
                         break;
-                    case ScrollWrapRecycler.SCROLL_RL_LOADING:
+                    case SCROLL_RL_LOADING:
                         refresh.setText("正在刷新...");
                         break;
-                    case ScrollWrapRecycler.SCROLL_RL_SUCCESS:
+                    case SCROLL_RL_SUCCESS:
                         refresh.setText("刷新成功");
                         break;
-                    case ScrollWrapRecycler.SCROLL_RL_FAILD:
+                    case SCROLL_RL_FAILD:
                         refresh.setText("刷新失败");
                         break;
                 }
@@ -103,24 +118,48 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void scrollLoadMoreState(int state) {
-
+                switch (state) {
+                    case SCROLL_RL_NOTSLIPPING:
+                        load.setText("加载更多");
+                        break;
+                    case SCROLL_RL_NOTMET:
+                        load.setText("上拉加载");
+                        break;
+                    case SCROLL_RL_REFRESH:
+                        load.setText("松开立即加载");
+                        break;
+                    case SCROLL_RL_LOADING:
+                        load.setText("正在加载...");
+                        break;
+                    case SCROLL_RL_SUCCESS:
+                        load.setText("加载成功");
+                        break;
+                    case SCROLL_RL_FAILD:
+                        load.setText("加载失败");
+                        break;
+                }
             }
 
             @Override
             public void refresh() {
-                Log.e("MainActivity", "模拟刷新");
                 //模拟刷新成功
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mCustomRv.setRefreshStatus(ScrollWrapRecycler.SCROLL_RL_SUCCESS);
+                        mCustomRv.setRefreshStatus(SCROLL_RL_SUCCESS);
                     }
                 }, 2000);
             }
 
             @Override
             public void loadMore() {
-
+                //模拟加载成功
+                mCustomRv.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCustomRv.setLoadMoreStatus(SCROLL_RL_SUCCESS);
+                    }
+                }, 2000);
             }
         });
         /**
