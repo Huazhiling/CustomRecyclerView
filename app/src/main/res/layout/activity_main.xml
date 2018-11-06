@@ -6,7 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
-
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/child_rv"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        android:layout_height="wrap_content"/>
     <com.dasu.recyclerlibrary.ui.ScrollWrapRecycler
         android:id="@+id/m_customrv"
         android:layout_width="match_parent"

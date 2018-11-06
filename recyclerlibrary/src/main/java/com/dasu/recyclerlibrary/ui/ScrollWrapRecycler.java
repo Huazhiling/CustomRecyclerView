@@ -231,7 +231,7 @@ public class ScrollWrapRecycler extends LinearLayout {
             addRefreshView(refreshView);
             addView(mRefreshView);
             isUseSelfRefresh = false;
-        }else{
+        } else {
             addView(mRefreshView);
         }
         addView(mRecyclerView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -241,7 +241,7 @@ public class ScrollWrapRecycler extends LinearLayout {
             addLoadMoreView(loadmoreView);
             addView(mLoadMoreView);
             isUseSelfLoadMore = false;
-        }else{
+        } else {
             addView(mLoadMoreView);
         }
         this.mRecyclerView.setAdapter(adapter);
@@ -358,6 +358,7 @@ public class ScrollWrapRecycler extends LinearLayout {
             public void run() {
                 setLoadMoreScrollAnimation(-mLoadMoreView.getMeasuredHeight());
                 isLoadMored = false;
+                notifyDataSetChanged();
             }
         }, 500);
     }
@@ -548,6 +549,25 @@ public class ScrollWrapRecycler extends LinearLayout {
                 this.scrollLoadMoreState(SCROLL_RL_REFRESH);
             }
         }
+    }
+
+    /**
+     * 刷新接口  调用后给动画  并且刷新
+     */
+    public void setRefresh() {
+        isRefreshing = true;
+        if (mCustomScrollListener != null && isUseSelfRefresh) {
+            mCustomScrollListener.scrollRefreshState(SCROLL_RL_LOADING);
+        } else {
+            scrollRefreshState(SCROLL_RL_LOADING);
+        }
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        },300);
+        setRefreshScrollAnimation((int) (mRefreshView.getMeasuredHeight() * 1.2));
     }
 
     /**

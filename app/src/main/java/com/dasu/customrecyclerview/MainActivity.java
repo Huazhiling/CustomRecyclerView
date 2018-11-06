@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -29,6 +30,7 @@ import static com.dasu.recyclerlibrary.ui.ScrollWrapRecycler.SCROLL_RL_SUCCESS;
 
 public class MainActivity extends AppCompatActivity {
     private ScrollWrapRecycler mCustomRv;
+    private RecyclerView mChildRv;
     private List<String> mData;
     private TextView refresh;
     private TextView load;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.mData = new ArrayList<>();
         this.mCustomRv = findViewById(R.id.m_customrv);
+        this.mChildRv = findViewById(R.id.child_rv);
         mCustomRv.setLayoutManager(new LinearLayoutManager(this));
         RvAdapter rvAdapter = new RvAdapter(mData, this);
 //        mCustomRv.addRefreshView(getTextView("刷新1", Color.parseColor("#CCCCCC")));
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addHeadView(getTextView("头部2", Color.parseColor("#90C56F")));
         mCustomRv.addHeadView(getTextView("头部4", Color.parseColor("#2cf0bc")));
         mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
+        mCustomRv.addHeadView(mChildRv);
         mCustomRv.addFootView(getTextView("尾部2", Color.parseColor("#90C56F")));
         load = getTextView("加载", Color.parseColor("#CCCCCC"));
         mCustomRv.addLoadMoreView(load);
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addFootView(getTextView("尾部7", Color.parseColor("#856fc2")));
 //        mCustomRv.addLoadMoreView(getTextView("加载", Color.parseColor("#CCCCCC")));
         mCustomRv.setAdapter(rvAdapter);
+        mChildRv.setAdapter(rvAdapter);
 //        refresh = getTextView("刷新3", Color.parseColor("#CCCCCC"));
 //        mCustomRv.addRefreshView(refresh);
         mCustomRv.setCustomClickListener(new ICustomClickListener() {
@@ -71,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.setmIScrollListener(new IScrollListener() {
             @Override
             public void loadMore() {
+                for (int i = 100; i < 105; i++) {
+                    mData.add("新增数据---" + i);
+                }
                 //模拟加载成功
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
@@ -168,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 30; i++) {
             mData.add("mData --- " + i);
         }
+        rvAdapter.notifyDataSetChanged();
+        mCustomRv.setRefresh();
     }
 
     public TextView getTextView(String content, int color) {
