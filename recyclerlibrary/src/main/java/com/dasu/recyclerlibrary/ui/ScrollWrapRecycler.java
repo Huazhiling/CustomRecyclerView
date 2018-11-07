@@ -523,11 +523,16 @@ public class ScrollWrapRecycler extends LinearLayout {
         isRefreshStatus = false;
         int bottomPadding = getBottomPadding(this);
         int scrollMax = bottomPadding;
+        Log.d("ScrollWrapRecycler", "phaseDiff:" + phaseDiff);
         if (phaseDiff < 0) {
+            if(scrollMax > mLoadMoreView.getMeasuredHeight() * 2){
+                return;
+            }
             scrollMax = scrollMax > mLoadMoreView.getMeasuredHeight() * 2 ? mLoadMoreView.getMeasuredHeight() * 2 : (int) (scrollMax - phaseDiff);
         } else {
             scrollMax = scrollMax < -mLoadMoreView.getMeasuredHeight() ? -mLoadMoreView.getMeasuredHeight() : (int) (scrollMax - phaseDiff);
         }
+        Log.e("ScrollWrapRecycler", "scrollMax:" + scrollMax);
         mRecyclerView.scrollToPosition(getAdapter().getItemCount() - 1);
         setPadding(0, 0, 0, scrollMax);
         requestLayout();
