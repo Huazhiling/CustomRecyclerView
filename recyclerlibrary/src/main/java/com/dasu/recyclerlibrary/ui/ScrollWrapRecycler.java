@@ -78,6 +78,7 @@ public class ScrollWrapRecycler extends LinearLayout {
 
     private Context mContext;
 
+
     public ScrollWrapRecycler(Context context) {
         this(context, null);
     }
@@ -128,7 +129,7 @@ public class ScrollWrapRecycler extends LinearLayout {
         setOrientation(VERTICAL);
         this.mRecyclerView = new CustomRecyclerView(context);
         this.mRecyclerView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
         refreshAnimator = new ValueAnimator();
         loadmoreAnimator = new ValueAnimator();
         /**
@@ -263,12 +264,34 @@ public class ScrollWrapRecycler extends LinearLayout {
     }
 
     /**
-     * 返回Adapter
-     *
      * @return
      */
-    public CustomAdapter getAdapter() {
+    private CustomAdapter getAdapter() {
         return this.mRecyclerView.getHeadAndFootAdapter();
+    }
+
+    /**
+     * 返回指定的Head
+     *
+     * @param index
+     * @return
+     */
+    public View getIndexHeadView(int index) {
+        if (mRefreshView != null)
+            return getAdapter().getIndexHeadView(index + 1);
+        return getAdapter().getIndexHeadView(index);
+    }
+
+    /**
+     * 返回指定的Foot
+     *
+     * @param index
+     * @return
+     */
+    public View getIndexFootView(int index) {
+        if (mLoadMoreView != null && index >= getAdapter().getFootSize())
+            return getAdapter().getIndexFootView(index - 1);
+        return getAdapter().getIndexFootView(index);
     }
 
     /**
@@ -525,7 +548,7 @@ public class ScrollWrapRecycler extends LinearLayout {
         int scrollMax = bottomPadding;
         Log.d("ScrollWrapRecycler", "phaseDiff:" + phaseDiff);
         if (phaseDiff < 0) {
-            if(scrollMax > mLoadMoreView.getMeasuredHeight() * 2){
+            if (scrollMax > mLoadMoreView.getMeasuredHeight() * 2) {
                 return;
             }
             scrollMax = scrollMax > mLoadMoreView.getMeasuredHeight() * 2 ? mLoadMoreView.getMeasuredHeight() * 2 : (int) (scrollMax - phaseDiff);
@@ -571,7 +594,7 @@ public class ScrollWrapRecycler extends LinearLayout {
             public void run() {
                 refresh();
             }
-        },300);
+        }, 300);
         setRefreshScrollAnimation((int) (mRefreshView.getMeasuredHeight() * 1.2));
     }
 
@@ -717,14 +740,14 @@ public class ScrollWrapRecycler extends LinearLayout {
 
     /**
      * ====================================================================================
-     * 以下提供的方法均调用的是CustomAdapter的方法  后期采用Diff的方式
+     * 以下提供的方法均调用的是CustomAdapter的方法
      * ====================================================================================
      */
     public void notifyDataSetChanged() {
         this.getAdapter().notifyDataSetChanged();
     }
 
-    public void notifyItemChanged(int position) {
+    public void notifyItemChanged(final int position) {
         this.getAdapter().notifyItemChanged(position);
     }
 

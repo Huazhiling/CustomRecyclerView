@@ -80,10 +80,6 @@ final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 //            if (null == contentView.getTag()) {
             contentView.setTag(contentView.getClass() + "_head_" + headcount);
             View cView = headConfig.get(headcount).getContentView();
-            headcount += 1;
-            if (headcount > headConfig.size() - 1) {
-                headcount = 0;
-            }
             ViewGroup vg = (ViewGroup) cView.getParent();
             if (vg != null) {
                 vg.removeView(cView);
@@ -91,6 +87,11 @@ final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             contentView.addView(cView);
             mCache.put((String) contentView.getTag(), contentView);
             CustomViewHolder customViewHolder = new CustomViewHolder(contentView);
+            customViewHolder.setIsRecyclable(headConfig.get(headcount).isCache());
+            headcount += 1;
+            if (headcount > headConfig.size() - 1) {
+                headcount = 0;
+            }
 //                customViewHolder.setIsRecyclable(false);
 //            Log.e("CustomAdapter", "onCreateViewHolder#HEADVIEW_TYPE");
             return customViewHolder;
@@ -196,6 +197,14 @@ final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public int getHeadSize() {
         return headConfig.size();
+    }
+
+    public View getIndexHeadView(int index) {
+        return headConfig.get(index).getContentView();
+    }
+
+    public View getIndexFootView(int index) {
+        return footConfig.get(index).getContentView();
     }
 
     public int getFootSize() {

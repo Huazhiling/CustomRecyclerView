@@ -6,16 +6,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/child_rv"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        android:layout_height="wrap_content"/>
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
     <com.dasu.recyclerlibrary.ui.ScrollWrapRecycler
         android:id="@+id/m_customrv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/change"
+        android:layout_width="match_parent"
+        android:onClick="onClick"
+        android:layout_height="wrap_content"
+        android:text="更换第一个元素内容Value" />
 
 </LinearLayout>
