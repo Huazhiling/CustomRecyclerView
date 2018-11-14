@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public final class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ViewConfig> headConfig;
     private List<ViewConfig> footConfig;
     private ArrayList<ViewConfig> EMPTY_LIST = new ArrayList<>();

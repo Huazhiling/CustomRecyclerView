@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import com.dasu.recyclerlibrary.listener.ICustomClickListener;
 import com.dasu.recyclerlibrary.listener.ICustomScrollListener;
 import com.dasu.recyclerlibrary.listener.IScrollListener;
 import com.dasu.recyclerlibrary.ui.ScrollWrapRecycler;
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mCustomRv.addHeadView(getTextView("头部2", Color.parseColor("#90C56F")));
         mCustomRv.addHeadView(getTextView("头部4", Color.parseColor("#2cf0bc")));
         mCustomRv.addFootView(getTextView("尾部1", Color.parseColor("#90C56F")));
-        mCustomRv.addHeadView(mChildRv,false);
+        mCustomRv.addHeadView(mChildRv, false);
         mCustomRv.addFootView(getTextView("尾部2", Color.parseColor("#90C56F")));
         load = getTextView("加载", Color.parseColor("#CCCCCC"));
         mCustomRv.addLoadMoreView(load);
@@ -66,20 +67,29 @@ public class MainActivity extends AppCompatActivity {
         mChildRv.setAdapter(rvAdapter);
 //        refresh = getTextView("刷新3", Color.parseColor("#CCCCCC"));
 //        mCustomRv.addRefreshView(refresh);
+        mCustomRv.setCustomClickListener(new ICustomClickListener() {
+            @Override
+            public void onClick(View view, int position, int type, Object... data) {
+                Log.e("MainActivity", "position:" + position);
+            }
+
+            @Override
+            public void onLongClick(View view, int position, int type, Object... data) {
+
+            }
+        });
         mCustomRv.setmIScrollListener(new IScrollListener() {
             @Override
             public void loadMore() {
-                for (int i = 100; i < 105; i++) {
-                    mData.add(new UserInfo(i, "数据源头--->" + i, i * 15));
-                }
-                rvAdapter.notifyDataSetChanged();
-                //模拟加载成功
-                mCustomRv.postDelayed(new Runnable() {
+                mCustomRv.post(new Runnable() {
                     @Override
                     public void run() {
+                        for (int i = 100; i < 105; i++) {
+//                            mData.add(new UserInfo(i, "数据源头--->" + i, i * 15));
+                        }
                         mCustomRv.setLoadMoreStatus(SCROLL_RL_SUCCESS);
                     }
-                }, 2000);
+                });
             }
 
             @Override
@@ -155,14 +165,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-                for (int i = 100; i < 105; i++) {
-                    mData.add(new UserInfo(i, "数据源头--->" + i, i * 15));
-                }
-                rvAdapter.notifyDataSetChanged();
                 //模拟加载成功
                 mCustomRv.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        for (int i = 100; i < 120; i++) {
+                            mData.add(new UserInfo(i, "数据源头--->" + i, i * 15));
+                        }
+//                        mCustomRv.scrollToPosition(mCustomRv.getAdapter().getItemCount() - 1);
                         mCustomRv.setLoadMoreStatus(SCROLL_RL_SUCCESS);
                     }
                 }, 2000);
@@ -176,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
             mData.add(userInfo);
         }
         rvAdapter.notifyDataSetChanged();
-        mCustomRv.setRefresh();
+//        mCustomRv.setRefresh();
+
     }
 
     public TextView getTextView(String content, int color) {

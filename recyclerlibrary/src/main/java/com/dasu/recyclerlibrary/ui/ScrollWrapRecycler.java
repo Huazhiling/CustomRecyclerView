@@ -266,7 +266,7 @@ public class ScrollWrapRecycler extends LinearLayout {
     /**
      * @return
      */
-    private CustomAdapter getAdapter() {
+    public CustomAdapter getAdapter() {
         return this.mRecyclerView.getHeadAndFootAdapter();
     }
 
@@ -376,14 +376,13 @@ public class ScrollWrapRecycler extends LinearLayout {
         } else {
             scrollLoadMoreState(status);
         }
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setLoadMoreScrollAnimation(-mLoadMoreView.getMeasuredHeight());
-                isLoadMored = false;
-                notifyDataSetChanged();
-            }
-        }, 500);
+        notifyDataSetChanged();
+        setLoadMoreScrollAnimation(-mLoadMoreView.getMeasuredHeight());
+        isLoadMored = false;
+    }
+
+    public void scrollToPosition(int position) {
+        mRecyclerView.scrollToPosition(position);
     }
 
     /**
@@ -438,26 +437,6 @@ public class ScrollWrapRecycler extends LinearLayout {
                         start_Y = move_Y;
                         return super.dispatchTouchEvent(ev);
                     }
-//                } else if (isFootViewVisibility && getMarginParams(mRefreshView).topMargin <= -mRefreshView.getMeasuredHeight()
-//                    && scroolRemaining > 0
-//                    && getAdapter().getItemCount() + 1 == layoutManager.findLastCompletelyVisibleItemPosition()/* && move_Y - start_Y < 0*/) {
-//                mLoadMoreView.setVisibility(VISIBLE);
-//                if (move_Y - start_Y > 0) {
-//                    float phaseDiff = move_Y - start_Y;
-//                    updateFoot((float) (phaseDiff / 1.5));
-//                } else {
-//                    float phaseDiff = move_Y - start_Y;
-//                    updateFoot((float) (phaseDiff / 1.5));
-//                }
-//                start_Y = move_Y;
-//                return true;
-//        } else{
-//            start_Y = move_Y;
-////                        getMarginParams().topMargin = -mRefreshView.getMeasuredHeight();
-////                        getMarginParams().bottomMargin = 0;
-////                        setRLayoutPramas(getMarginParams());
-//            return super.dispatchTouchEvent(ev);
-//        }
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
                     /*
@@ -491,7 +470,7 @@ public class ScrollWrapRecycler extends LinearLayout {
                                 } else {
                                     scrollLoadMoreState(SCROLL_RL_LOADING);
                                 }
-                                setLoadMoreScrollAnimation(mLoadMoreView.getMeasuredHeight());
+                                setLoadMoreScrollAnimation(0);
                             } else {
                                 setLoadMoreScrollAnimation(-mLoadMoreView.getMeasuredHeight());
                             }
@@ -546,34 +525,32 @@ public class ScrollWrapRecycler extends LinearLayout {
         isRefreshStatus = false;
         int bottomPadding = getBottomPadding(this);
         int scrollMax = bottomPadding;
-        Log.d("ScrollWrapRecycler", "phaseDiff:" + phaseDiff);
         if (phaseDiff < 0) {
-            if (scrollMax > mLoadMoreView.getMeasuredHeight() * 2) {
+            if (scrollMax > mLoadMoreView.getMeasuredHeight() * 0.8) {
                 return;
             }
-            scrollMax = scrollMax > mLoadMoreView.getMeasuredHeight() * 2 ? mLoadMoreView.getMeasuredHeight() * 2 : (int) (scrollMax - phaseDiff);
+            scrollMax = scrollMax > mLoadMoreView.getMeasuredHeight() * 0.8 ? (int) (mLoadMoreView.getMeasuredHeight() * 0.8) : (int) (scrollMax - phaseDiff);
         } else {
             scrollMax = scrollMax < -mLoadMoreView.getMeasuredHeight() ? -mLoadMoreView.getMeasuredHeight() : (int) (scrollMax - phaseDiff);
         }
-        Log.e("ScrollWrapRecycler", "scrollMax:" + scrollMax);
         mRecyclerView.scrollToPosition(getAdapter().getItemCount() - 1);
         setPadding(0, 0, 0, scrollMax);
         requestLayout();
         if (isUseSelfLoadMore) {
             if (mCustomScrollListener != null) {
-                if (scrollMax < mLoadMoreView.getMeasuredHeight() * 1.2) {
+                if (scrollMax < mLoadMoreView.getMeasuredHeight() * 0.5) {
                     this.loadMoreScrollStatus = SCROLL_RL_NOTMET;
                     mCustomScrollListener.scrollLoadMoreState(SCROLL_RL_NOTMET);
-                } else if (scrollMax > mLoadMoreView.getMeasuredHeight() * 1.2) {
+                } else if (scrollMax > mLoadMoreView.getMeasuredHeight() * 0.5) {
                     this.loadMoreScrollStatus = SCROLL_RL_REFRESH;
                     mCustomScrollListener.scrollLoadMoreState(SCROLL_RL_REFRESH);
                 }
 //                mCustomScrollListener.scrollRefreshState(scrollMax > mRefreshView.getMeasuredHeight());
             }
         } else {
-            if (scrollMax < mLoadMoreView.getMeasuredHeight() * 1.2) {
+            if (scrollMax < mLoadMoreView.getMeasuredHeight() * 0.5) {
                 this.scrollLoadMoreState(SCROLL_RL_NOTMET);
-            } else if (scrollMax > mLoadMoreView.getMeasuredHeight() * 1.2) {
+            } else if (scrollMax > mLoadMoreView.getMeasuredHeight() *0.5) {
                 this.scrollLoadMoreState(SCROLL_RL_REFRESH);
             }
         }
@@ -695,6 +672,15 @@ public class ScrollWrapRecycler extends LinearLayout {
     }
 
     /**
+     * 实际的内容size
+     *
+     * @return
+     */
+    public int getFullSize() {
+        return getAdapter().getItemCount() - (mRefreshView != null ? 1 : 0) - (mLoadMoreView != null ? 1 : 0);
+    }
+
+    /**
      * 获取View的Params  用来更改Margin
      *
      * @param view
@@ -734,7 +720,7 @@ public class ScrollWrapRecycler extends LinearLayout {
     public void setLoadMoreScrollAnimation(int height) {
         PropertyValuesHolder valuesHolder = PropertyValuesHolder.ofFloat("", getBottomPadding(this), height);
         loadmoreAnimator.setValues(valuesHolder);
-        loadmoreAnimator.setDuration(300);
+        loadmoreAnimator.setDuration(0);
         loadmoreAnimator.start();
     }
 
