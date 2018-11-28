@@ -232,7 +232,7 @@ public class ScrollWrapRecycler extends LinearLayout {
             addRefreshView(refreshView);
             addView(mRefreshView);
             isUseSelfRefresh = false;
-        } else {
+        } else if(mRefreshView != null){
             addView(mRefreshView);
         }
         addView(mRecyclerView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -242,7 +242,7 @@ public class ScrollWrapRecycler extends LinearLayout {
             addLoadMoreView(loadmoreView);
             addView(mLoadMoreView);
             isUseSelfLoadMore = false;
-        } else {
+        } else if(mLoadMoreView != null){
             addView(mLoadMoreView);
         }
         this.mRecyclerView.setAdapter(adapter);
