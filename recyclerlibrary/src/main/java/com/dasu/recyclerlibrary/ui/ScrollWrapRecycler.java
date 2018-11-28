@@ -226,7 +226,7 @@ public class ScrollWrapRecycler extends LinearLayout {
         View refreshView;
         View loadmoreView;
         //初始化的时候根据是否需要刷新加载给一个默认
-        if (mRefreshView == null && isRefresh) {
+        if (mRefreshView == null && isRefresh && this.isRefresh && this.isLoadMore) {
             refreshView = LayoutInflater.from(mContext).inflate(R.layout.item_defalut_refresh_view, null);
             mRefreshHint = (TextView) refreshView.findViewById(R.id.m_refresh_hint);
             addRefreshView(refreshView);
