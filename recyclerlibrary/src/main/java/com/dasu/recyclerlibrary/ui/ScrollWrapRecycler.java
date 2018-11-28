@@ -483,8 +483,8 @@ public class ScrollWrapRecycler extends LinearLayout {
                     isRefreshStatus = false;
                     break;
             }
-        } else {
-            return true;
+        } else if(!isRefresh || !isLoadMore){
+            return super.dispatchTouchEvent(ev);
         }
         return super.dispatchTouchEvent(ev);
     }
