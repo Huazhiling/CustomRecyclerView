@@ -236,10 +236,9 @@ public class ScrollWrapRecycler extends LinearLayout {
             addView(mRefreshView);
         }
         ViewGroup parent = (ViewGroup) mRecyclerView.getParent();
-        if (parent!=null) {
-            parent.removeView(mRecyclerView);
+        if (parent==null) {
+            addView(mRecyclerView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         }
-        addView(mRecyclerView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         if (mLoadMoreView == null && isLoadMore) {
             loadmoreView = LayoutInflater.from(mContext).inflate(R.layout.item_defalut_loadmore_view, null);
             mLoadMoreHint = (TextView) loadmoreView.findViewById(R.id.m_loadmore_hint);
